@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SleepDataCardView: View {
-    @State var data: SleepData
+    @Binding var data: SleepData
     
     var body: some View {
         HStack {
@@ -18,6 +18,6 @@ struct SleepDataCardView: View {
             Spacer()
             Text(data.stage.rawValue)
         }
-        .padding(.horizontal)
+        .padding()
     }
 }

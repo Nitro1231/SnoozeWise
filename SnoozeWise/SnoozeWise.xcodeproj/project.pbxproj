@@ -11,7 +11,7 @@
 		7E850BC72B8814A000E25E1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E850BC62B8814A000E25E1D /* Assets.xcassets */; };
 		7E850BCA2B8814A000E25E1D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E850BC92B8814A000E25E1D /* Preview Assets.xcassets */; };
 		7E850BD12B8814F400E25E1D /* Health.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BD02B8814F400E25E1D /* Health.swift */; };
-		7E850BD32B88151300E25E1D /* Homepage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BD22B88151300E25E1D /* Homepage.swift */; };
+		7E850BD32B88151300E25E1D /* HomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BD22B88151300E25E1D /* HomePageView.swift */; };
 		7E850BD52B88154100E25E1D /* SleepDataCardEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BD42B88154100E25E1D /* SleepDataCardEditView.swift */; };
 		7E850BD72B88155D00E25E1D /* SleepDataCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BD62B88155D00E25E1D /* SleepDataCardView.swift */; };
 		7E850BD92B88157400E25E1D /* SleepDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BD82B88157400E25E1D /* SleepDataView.swift */; };
@@ -25,7 +25,7 @@
 		7E850BC62B8814A000E25E1D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7E850BC92B8814A000E25E1D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		7E850BD02B8814F400E25E1D /* Health.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Health.swift; sourceTree = "<group>"; };
-		7E850BD22B88151300E25E1D /* Homepage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Homepage.swift; sourceTree = "<group>"; };
+		7E850BD22B88151300E25E1D /* HomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageView.swift; sourceTree = "<group>"; };
 		7E850BD42B88154100E25E1D /* SleepDataCardEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataCardEditView.swift; sourceTree = "<group>"; };
 		7E850BD62B88155D00E25E1D /* SleepDataCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataCardView.swift; sourceTree = "<group>"; };
 		7E850BD82B88157400E25E1D /* SleepDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataView.swift; sourceTree = "<group>"; };
@@ -68,7 +68,7 @@
 				7E850BC22B88149D00E25E1D /* SnoozeWiseApp.swift */,
 				7E850BD02B8814F400E25E1D /* Health.swift */,
 				7E850BDC2B8815BB00E25E1D /* SnoozeTabView.swift */,
-				7E850BD22B88151300E25E1D /* Homepage.swift */,
+				7E850BD22B88151300E25E1D /* HomePageView.swift */,
 				7E850BD42B88154100E25E1D /* SleepDataCardEditView.swift */,
 				7E850BD62B88155D00E25E1D /* SleepDataCardView.swift */,
 				7E850BD82B88157400E25E1D /* SleepDataView.swift */,
@@ -103,6 +103,8 @@
 			dependencies = (
 			);
 			name = SnoozeWise;
+			packageProductDependencies = (
+			);
 			productName = SnoozeWise;
 			productReference = 7E850BBF2B88149D00E25E1D /* SnoozeWise.app */;
 			productType = "com.apple.product-type.application";
@@ -131,6 +133,9 @@
 				Base,
 			);
 			mainGroup = 7E850BB62B88149D00E25E1D;
+			packageReferences = (
+				7EC899ED2B891C8D00DAE402 /* XCRemoteSwiftPackageReference "ChartView" */,
+			);
 			productRefGroup = 7E850BC02B88149D00E25E1D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -160,7 +165,7 @@
 				7E850BD92B88157400E25E1D /* SleepDataView.swift in Sources */,
 				7E850BD72B88155D00E25E1D /* SleepDataCardView.swift in Sources */,
 				7E850BD52B88154100E25E1D /* SleepDataCardEditView.swift in Sources */,
-				7E850BD32B88151300E25E1D /* Homepage.swift in Sources */,
+				7E850BD32B88151300E25E1D /* HomePageView.swift in Sources */,
 				7E850BDB2B88159700E25E1D /* SleepPredictionView.swift in Sources */,
 				7E850BC32B88149D00E25E1D /* SnoozeWiseApp.swift in Sources */,
 				7E850BDD2B8815BB00E25E1D /* SnoozeTabView.swift in Sources */,
@@ -374,6 +379,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7EC899ED2B891C8D00DAE402 /* XCRemoteSwiftPackageReference "ChartView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AppPear/ChartView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.5;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = 7E850BB72B88149D00E25E1D /* Project object */;
 }

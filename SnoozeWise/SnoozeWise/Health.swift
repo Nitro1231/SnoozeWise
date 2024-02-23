@@ -14,10 +14,10 @@ enum Stage: String, CaseIterable {
     case coreSleep = "Core Sleep"
     case deepSleep = "Deep Sleep"
     case remSleep = "REM Sleep"
-    case unknown = "Uknown"
+    case unknown = "Unknown"
 }
 
-struct SleepData {
+struct SleepData: Identifiable {
     var id = UUID()
     var start_time: Date
     var end_time: Date
@@ -25,9 +25,9 @@ struct SleepData {
 }
 
 extension Date {
-    func formatDate() -> String {
+    func formatDate(format: String = "MMM d, yyyy h:mm a") -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d, yyyy h:mm a"
+        formatter.dateFormat = format
         return formatter.string(from: self)
     }
     
@@ -37,12 +37,14 @@ extension Date {
 }
 
 class Health: ObservableObject {
+    let healthStore = HKHealthStore()
     
     @Published var sleepData: [SleepData] = []
-    let healthStore = HKHealthStore()
+    @Published var dateOfBirth: Date?
     
     init() {
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
+        
         let allTypes: Set<HKSampleType> = [
             sleepType
         ]
@@ -52,7 +54,7 @@ class Health: ObservableObject {
             do {
                 try await healthStore.requestAuthorization(toShare: [], read: allTypes)
                 
-//                self.fetchSleepAnalysis()
+                fetchSleepAnalysis()
             } catch {
                 print("Error fetching health data: \(error.localizedDescription)")
             }
@@ -103,15 +105,5 @@ class Health: ObservableObject {
         }
             
         self.healthStore.execute(query)
-    }
-    
-    func dateOfBirth(completion: @escaping (DateComponents?, Error?) -> Void) {
-        do {
-            let dateOfBirth = try healthStore.dateOfBirthComponents()
-            completion(dateOfBirth, nil)
-        } catch {
-            print("Error fetching date of birth: \(error.localizedDescription)")
-            completion(nil, error)
-        }
     }
 }

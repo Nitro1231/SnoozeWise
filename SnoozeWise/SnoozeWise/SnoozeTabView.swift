@@ -9,40 +9,43 @@ import SwiftUI
 
 struct SnoozeTabView: View {
     @EnvironmentObject var health: Health
+    @State var selected = "HomePage"
     @State private var isRefreshing = false
     
-    @State var selected = "HomePage"
-    
     var body: some View {
-        TabView(selection: $selected) {
-            SleepDataView()
-                .tag("SleepData")
-                .tabItem{
-                    Image(systemName: "bed.double")
+        NavigationView {
+            TabView(selection: $selected) {
+                SleepDataView()
+                    .tag("SleepData")
+                    .tabItem{
+                        Image(systemName: "bed.double")
+                    }
+                    .environmentObject(health)
+                
+                HomePageView()
+                    .tag("HomePage")
+                    .tabItem{
+                        Image(systemName: "house")
+                    }
+                    .environmentObject(health)
+                
+                SleepPredictionView()
+                    .tag("SleepPrediction")
+                    .tabItem{
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                    }
+                    .environmentObject(health)
+            }
+            .navigationBarTitle("SnoozeWise", displayMode: .inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        refreshData()
+                    }) {
+                        Image(systemName: "arrow.clockwise.circle")
+                    }
+                    .disabled(isRefreshing)
                 }
-                .environmentObject(health)
-            
-            HomepageView()
-                .tag("HomePage")
-                .tabItem{
-                    Image(systemName: "house")
-                }
-                .environmentObject(health)
-            
-            SleepPredictionView()
-                .tag("SleepPrediction")
-                .tabItem{
-                    Image(systemName: "chart.line.uptrend.xyaxis")
-                }
-                .environmentObject(health)
-        }.toolbar {
-            ToolbarItem() {
-                Button(action: {
-                    refreshData()
-                }) {
-                    Image(systemName: "arrow.clockwise.circle")
-                }
-                .disabled(isRefreshing)
             }
         }
     }

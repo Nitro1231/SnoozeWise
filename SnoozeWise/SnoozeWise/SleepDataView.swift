@@ -9,27 +9,39 @@ import SwiftUI
 
 struct SleepDataView: View {
     @EnvironmentObject var health: Health
-    @State private var hasLoadedData = false
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                LazyVStack(spacing: 20) {
-                    Text("Sleep Data")
-                    ForEach(health.sleepData.sorted(by: { $0.start_time > $1.start_time }), id: \.id) { item in
-                        NavigationLink(destination: SleepDataCardEditView(data: Binding.constant(item))) {
-                            SleepDataCardView(data: item)
+        NavigationView{
+            VStack {
+                HStack {
+                    Text("Start Time")
+                    Spacer()
+                    Text("End Time")
+                    Spacer()
+                    Text("Sleep Stage")
+                }
+                .padding(.horizontal)
+
+                Divider()
+                
+                ScrollView {
+                    LazyVStack(spacing: 20) {
+                        ForEach(health.sleepData.indices, id: \.self) { index in
+                            NavigationLink(destination: SleepDataCardEditView(data: $health.sleepData[index])){
+                                SleepDataCardView(data: $health.sleepData[index])
+                            }
                         }
                     }
                 }
-                .padding()
             }
-            .onAppear {
-                if !hasLoadedData {
-                    health.fetchSleepAnalysis()
-                    hasLoadedData = true
-                }
-            }
+            .padding()
         }
     }
 }
+
+//struct SleepDataView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        let h = Health()
+//        SnoozeTabView().environmentObject(h)
+//    }
+//}
