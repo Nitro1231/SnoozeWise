@@ -31,17 +31,8 @@ extension Date {
         return formatter.string(from: self)
     }
     
-    func oneYearAgo() -> Date {
-        let calendar = Calendar.current
-        return calendar.date(byAdding: .year, value: -1, to: self)!
-    }
-    
-    var oneWeekAgo: Date {
-        return Calendar.current.date(byAdding: .weekOfYear, value: -1, to: self)!
-    }
-    
-    static func oneDayAgo() -> Date {
-        return Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+    func daysBack(_ days: Int) -> Date {
+        return Calendar.current.date(byAdding: .day, value: -days, to: self) ?? self
     }
 }
 
@@ -56,6 +47,7 @@ class Health: ObservableObject {
             sleepType
         ]
         
+        print()
         Task {
             do {
                 try await healthStore.requestAuthorization(toShare: [], read: allTypes)
@@ -68,12 +60,8 @@ class Health: ObservableObject {
     }
     
     func fetchSleepAnalysis() -> Void {
-        // Get the date for one week ago
-//        let oneWeekAgoDate = Date().addingTimeInterval(-7 * 24 * 60 * 60) // 7 days * 24 hours * 60 minutes * 60 seconds
-
-        // Create a predicate to fetch samples recorded after one week ago
-        let predicate = HKQuery.predicateForSamples(withStart: Date().oneYearAgo(), end: Date(), options: [])
-
+        
+        let predicate = HKQuery.predicateForSamples(withStart: Date().daysBack(740), end: Date(), options: [])
             
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
@@ -127,4 +115,3 @@ class Health: ObservableObject {
         }
     }
 }
-

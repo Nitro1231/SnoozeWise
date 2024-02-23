@@ -7,35 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7E7A827C2B87098400EF5530 /* SnooseWiseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E7A827B2B87098400EF5530 /* SnooseWiseApp.swift */; };
-		7E7A82802B87098600EF5530 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E7A827F2B87098600EF5530 /* Assets.xcassets */; };
-		7E7A82832B87098600EF5530 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E7A82822B87098600EF5530 /* Preview Assets.xcassets */; };
-		7E7A828D2B87342700EF5530 /* SnoozeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E7A828C2B87342600EF5530 /* SnoozeTabView.swift */; };
-		7E7A82912B8736F600EF5530 /* HomepageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E7A82902B8736F600EF5530 /* HomepageView.swift */; };
-		7E7A82932B873AB700EF5530 /* SleepPredictionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E7A82922B873AB700EF5530 /* SleepPredictionView.swift */; };
-		7E7A82952B873EBF00EF5530 /* Health.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E7A82942B873EBF00EF5530 /* Health.swift */; };
-		7ED21AAF2B87DAC000DC14E8 /* SleepDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ED21AAE2B87DAC000DC14E8 /* SleepDataView.swift */; };
-		7ED21AB12B87E2BE00DC14E8 /* SleepDataCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ED21AB02B87E2BE00DC14E8 /* SleepDataCardView.swift */; };
-		7ED21AB32B87E50D00DC14E8 /* SleepDataCardEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ED21AB22B87E50D00DC14E8 /* SleepDataCardEditView.swift */; };
+		7E850BC32B88149D00E25E1D /* SnoozeWiseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BC22B88149D00E25E1D /* SnoozeWiseApp.swift */; };
+		7E850BC72B8814A000E25E1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E850BC62B8814A000E25E1D /* Assets.xcassets */; };
+		7E850BCA2B8814A000E25E1D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E850BC92B8814A000E25E1D /* Preview Assets.xcassets */; };
+		7E850BD12B8814F400E25E1D /* Health.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BD02B8814F400E25E1D /* Health.swift */; };
+		7E850BD32B88151300E25E1D /* Homepage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BD22B88151300E25E1D /* Homepage.swift */; };
+		7E850BD52B88154100E25E1D /* SleepDataCardEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BD42B88154100E25E1D /* SleepDataCardEditView.swift */; };
+		7E850BD72B88155D00E25E1D /* SleepDataCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BD62B88155D00E25E1D /* SleepDataCardView.swift */; };
+		7E850BD92B88157400E25E1D /* SleepDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BD82B88157400E25E1D /* SleepDataView.swift */; };
+		7E850BDB2B88159700E25E1D /* SleepPredictionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BDA2B88159700E25E1D /* SleepPredictionView.swift */; };
+		7E850BDD2B8815BB00E25E1D /* SnoozeTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BDC2B8815BB00E25E1D /* SnoozeTabView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		7E7A82782B87098400EF5530 /* snoosewise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = snoosewise.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		7E7A827B2B87098400EF5530 /* SnooseWiseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnooseWiseApp.swift; sourceTree = "<group>"; };
-		7E7A827F2B87098600EF5530 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		7E7A82822B87098600EF5530 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		7E7A82892B870C6400EF5530 /* snoosewise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = snoosewise.entitlements; sourceTree = "<group>"; };
-		7E7A828C2B87342600EF5530 /* SnoozeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeTabView.swift; sourceTree = "<group>"; };
-		7E7A82902B8736F600EF5530 /* HomepageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomepageView.swift; sourceTree = "<group>"; };
-		7E7A82922B873AB700EF5530 /* SleepPredictionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepPredictionView.swift; sourceTree = "<group>"; };
-		7E7A82942B873EBF00EF5530 /* Health.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Health.swift; sourceTree = "<group>"; };
-		7ED21AAE2B87DAC000DC14E8 /* SleepDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataView.swift; sourceTree = "<group>"; };
-		7ED21AB02B87E2BE00DC14E8 /* SleepDataCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataCardView.swift; sourceTree = "<group>"; };
-		7ED21AB22B87E50D00DC14E8 /* SleepDataCardEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataCardEditView.swift; sourceTree = "<group>"; };
+		7E850BBF2B88149D00E25E1D /* SnoozeWise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnoozeWise.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E850BC22B88149D00E25E1D /* SnoozeWiseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeWiseApp.swift; sourceTree = "<group>"; };
+		7E850BC62B8814A000E25E1D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7E850BC92B8814A000E25E1D /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		7E850BD02B8814F400E25E1D /* Health.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Health.swift; sourceTree = "<group>"; };
+		7E850BD22B88151300E25E1D /* Homepage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Homepage.swift; sourceTree = "<group>"; };
+		7E850BD42B88154100E25E1D /* SleepDataCardEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataCardEditView.swift; sourceTree = "<group>"; };
+		7E850BD62B88155D00E25E1D /* SleepDataCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataCardView.swift; sourceTree = "<group>"; };
+		7E850BD82B88157400E25E1D /* SleepDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataView.swift; sourceTree = "<group>"; };
+		7E850BDA2B88159700E25E1D /* SleepPredictionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepPredictionView.swift; sourceTree = "<group>"; };
+		7E850BDC2B8815BB00E25E1D /* SnoozeTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeTabView.swift; sourceTree = "<group>"; };
+		7E850BDE2B8815DA00E25E1D /* SnoozeWise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SnoozeWise.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		7E7A82752B87098400EF5530 /* Frameworks */ = {
+		7E850BBC2B88149D00E25E1D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -45,44 +45,44 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		7E7A826F2B87098400EF5530 = {
+		7E850BB62B88149D00E25E1D = {
 			isa = PBXGroup;
 			children = (
-				7E7A827A2B87098400EF5530 /* snoosewise */,
-				7E7A82792B87098400EF5530 /* Products */,
+				7E850BC12B88149D00E25E1D /* SnoozeWise */,
+				7E850BC02B88149D00E25E1D /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		7E7A82792B87098400EF5530 /* Products */ = {
+		7E850BC02B88149D00E25E1D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7E7A82782B87098400EF5530 /* snoosewise.app */,
+				7E850BBF2B88149D00E25E1D /* SnoozeWise.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		7E7A827A2B87098400EF5530 /* snoosewise */ = {
+		7E850BC12B88149D00E25E1D /* SnoozeWise */ = {
 			isa = PBXGroup;
 			children = (
-				7E7A82942B873EBF00EF5530 /* Health.swift */,
-				7E7A82902B8736F600EF5530 /* HomepageView.swift */,
-				7E7A828C2B87342600EF5530 /* SnoozeTabView.swift */,
-				7ED21AAE2B87DAC000DC14E8 /* SleepDataView.swift */,
-				7ED21AB02B87E2BE00DC14E8 /* SleepDataCardView.swift */,
-				7ED21AB22B87E50D00DC14E8 /* SleepDataCardEditView.swift */,
-				7E7A82922B873AB700EF5530 /* SleepPredictionView.swift */,
-				7E7A82892B870C6400EF5530 /* snoosewise.entitlements */,
-				7E7A827B2B87098400EF5530 /* SnooseWiseApp.swift */,
-				7E7A827F2B87098600EF5530 /* Assets.xcassets */,
-				7E7A82812B87098600EF5530 /* Preview Content */,
+				7E850BDE2B8815DA00E25E1D /* SnoozeWise.entitlements */,
+				7E850BC22B88149D00E25E1D /* SnoozeWiseApp.swift */,
+				7E850BD02B8814F400E25E1D /* Health.swift */,
+				7E850BDC2B8815BB00E25E1D /* SnoozeTabView.swift */,
+				7E850BD22B88151300E25E1D /* Homepage.swift */,
+				7E850BD42B88154100E25E1D /* SleepDataCardEditView.swift */,
+				7E850BD62B88155D00E25E1D /* SleepDataCardView.swift */,
+				7E850BD82B88157400E25E1D /* SleepDataView.swift */,
+				7E850BDA2B88159700E25E1D /* SleepPredictionView.swift */,
+				7E850BC62B8814A000E25E1D /* Assets.xcassets */,
+				7E850BC82B8814A000E25E1D /* Preview Content */,
 			);
-			path = snoosewise;
+			path = SnoozeWise;
 			sourceTree = "<group>";
 		};
-		7E7A82812B87098600EF5530 /* Preview Content */ = {
+		7E850BC82B8814A000E25E1D /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				7E7A82822B87098600EF5530 /* Preview Assets.xcassets */,
+				7E850BC92B8814A000E25E1D /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -90,39 +90,39 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		7E7A82772B87098400EF5530 /* snoosewise */ = {
+		7E850BBE2B88149D00E25E1D /* SnoozeWise */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7E7A82862B87098600EF5530 /* Build configuration list for PBXNativeTarget "snoosewise" */;
+			buildConfigurationList = 7E850BCD2B8814A000E25E1D /* Build configuration list for PBXNativeTarget "SnoozeWise" */;
 			buildPhases = (
-				7E7A82742B87098400EF5530 /* Sources */,
-				7E7A82752B87098400EF5530 /* Frameworks */,
-				7E7A82762B87098400EF5530 /* Resources */,
+				7E850BBB2B88149D00E25E1D /* Sources */,
+				7E850BBC2B88149D00E25E1D /* Frameworks */,
+				7E850BBD2B88149D00E25E1D /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = snoosewise;
-			productName = snoosewise;
-			productReference = 7E7A82782B87098400EF5530 /* snoosewise.app */;
+			name = SnoozeWise;
+			productName = SnoozeWise;
+			productReference = 7E850BBF2B88149D00E25E1D /* SnoozeWise.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		7E7A82702B87098400EF5530 /* Project object */ = {
+		7E850BB72B88149D00E25E1D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1430;
+				LastSwiftUpdateCheck = 1520;
 				LastUpgradeCheck = 1520;
 				TargetAttributes = {
-					7E7A82772B87098400EF5530 = {
-						CreatedOnToolsVersion = 14.3.1;
+					7E850BBE2B88149D00E25E1D = {
+						CreatedOnToolsVersion = 15.2;
 					};
 				};
 			};
-			buildConfigurationList = 7E7A82732B87098400EF5530 /* Build configuration list for PBXProject "snoosewise" */;
+			buildConfigurationList = 7E850BBA2B88149D00E25E1D /* Build configuration list for PBXProject "SnoozeWise" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -130,51 +130,52 @@
 				en,
 				Base,
 			);
-			mainGroup = 7E7A826F2B87098400EF5530;
-			productRefGroup = 7E7A82792B87098400EF5530 /* Products */;
+			mainGroup = 7E850BB62B88149D00E25E1D;
+			productRefGroup = 7E850BC02B88149D00E25E1D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7E7A82772B87098400EF5530 /* snoosewise */,
+				7E850BBE2B88149D00E25E1D /* SnoozeWise */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		7E7A82762B87098400EF5530 /* Resources */ = {
+		7E850BBD2B88149D00E25E1D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E7A82832B87098600EF5530 /* Preview Assets.xcassets in Resources */,
-				7E7A82802B87098600EF5530 /* Assets.xcassets in Resources */,
+				7E850BCA2B8814A000E25E1D /* Preview Assets.xcassets in Resources */,
+				7E850BC72B8814A000E25E1D /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		7E7A82742B87098400EF5530 /* Sources */ = {
+		7E850BBB2B88149D00E25E1D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7ED21AAF2B87DAC000DC14E8 /* SleepDataView.swift in Sources */,
-				7ED21AB12B87E2BE00DC14E8 /* SleepDataCardView.swift in Sources */,
-				7E7A82932B873AB700EF5530 /* SleepPredictionView.swift in Sources */,
-				7E7A82952B873EBF00EF5530 /* Health.swift in Sources */,
-				7ED21AB32B87E50D00DC14E8 /* SleepDataCardEditView.swift in Sources */,
-				7E7A828D2B87342700EF5530 /* SnoozeTabView.swift in Sources */,
-				7E7A82912B8736F600EF5530 /* HomepageView.swift in Sources */,
-				7E7A827C2B87098400EF5530 /* SnooseWiseApp.swift in Sources */,
+				7E850BD92B88157400E25E1D /* SleepDataView.swift in Sources */,
+				7E850BD72B88155D00E25E1D /* SleepDataCardView.swift in Sources */,
+				7E850BD52B88154100E25E1D /* SleepDataCardEditView.swift in Sources */,
+				7E850BD32B88151300E25E1D /* Homepage.swift in Sources */,
+				7E850BDB2B88159700E25E1D /* SleepPredictionView.swift in Sources */,
+				7E850BC32B88149D00E25E1D /* SnoozeWiseApp.swift in Sources */,
+				7E850BDD2B8815BB00E25E1D /* SnoozeTabView.swift in Sources */,
+				7E850BD12B8814F400E25E1D /* Health.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		7E7A82842B87098600EF5530 /* Debug */ = {
+		7E850BCB2B8814A000E25E1D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -208,7 +209,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -222,20 +223,22 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		7E7A82852B87098600EF5530 /* Release */ = {
+		7E850BCC2B8814A000E25E1D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -269,7 +272,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -277,29 +280,29 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		7E7A82872B87098600EF5530 /* Debug */ = {
+		7E850BCE2B8814A000E25E1D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = snoosewise/snoosewise.entitlements;
+				CODE_SIGN_ENTITLEMENTS = SnoozeWise/SnoozeWise.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"snoosewise/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"SnoozeWise/Preview Content\"";
 				DEVELOPMENT_TEAM = DCXKK746R9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Your health data is used to give you access to all of this app's features.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data for our features.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -310,7 +313,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rohangupta.snoosewise;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rohangupta.SnoozeWise;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -318,19 +321,19 @@
 			};
 			name = Debug;
 		};
-		7E7A82882B87098600EF5530 /* Release */ = {
+		7E850BCF2B8814A000E25E1D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = snoosewise/snoosewise.entitlements;
+				CODE_SIGN_ENTITLEMENTS = SnoozeWise/SnoozeWise.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"snoosewise/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"SnoozeWise/Preview Content\"";
 				DEVELOPMENT_TEAM = DCXKK746R9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Your health data is used to give you access to all of this app's features.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data for our features.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -341,7 +344,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.rohangupta.snoosewise;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rohangupta.SnoozeWise;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -352,25 +355,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7E7A82732B87098400EF5530 /* Build configuration list for PBXProject "snoosewise" */ = {
+		7E850BBA2B88149D00E25E1D /* Build configuration list for PBXProject "SnoozeWise" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7E7A82842B87098600EF5530 /* Debug */,
-				7E7A82852B87098600EF5530 /* Release */,
+				7E850BCB2B8814A000E25E1D /* Debug */,
+				7E850BCC2B8814A000E25E1D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7E7A82862B87098600EF5530 /* Build configuration list for PBXNativeTarget "snoosewise" */ = {
+		7E850BCD2B8814A000E25E1D /* Build configuration list for PBXNativeTarget "SnoozeWise" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7E7A82872B87098600EF5530 /* Debug */,
-				7E7A82882B87098600EF5530 /* Release */,
+				7E850BCE2B8814A000E25E1D /* Debug */,
+				7E850BCF2B8814A000E25E1D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 7E7A82702B87098400EF5530 /* Project object */;
+	rootObject = 7E850BB72B88149D00E25E1D /* Project object */;
 }

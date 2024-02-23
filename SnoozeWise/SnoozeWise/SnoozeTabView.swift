@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SnoozeTabView: View {
     @EnvironmentObject var health: Health
+    @State private var isRefreshing = false
     
     @State var selected = "HomePage"
     
@@ -17,7 +18,7 @@ struct SnoozeTabView: View {
             SleepDataView()
                 .tag("SleepData")
                 .tabItem{
-                    Image(systemName: "square.and.pencil.circle.fill")
+                    Image(systemName: "bed.double")
                 }
                 .environmentObject(health)
             
@@ -31,12 +32,28 @@ struct SnoozeTabView: View {
             SleepPredictionView()
                 .tag("SleepPrediction")
                 .tabItem{
-                    Image(systemName: "bed.double.fill")
+                    Image(systemName: "chart.line.uptrend.xyaxis")
                 }
                 .environmentObject(health)
+        }.toolbar {
+            ToolbarItem() {
+                Button(action: {
+                    refreshData()
+                }) {
+                    Image(systemName: "arrow.clockwise.circle")
+                }
+                .disabled(isRefreshing)
+            }
         }
     }
+    
+    private func refreshData() {
+        isRefreshing = true
+        health.fetchSleepAnalysis()
+        isRefreshing = false
+    }
 }
+
 
 struct SnoozeTabView_Previews: PreviewProvider {
     static var previews: some View {
