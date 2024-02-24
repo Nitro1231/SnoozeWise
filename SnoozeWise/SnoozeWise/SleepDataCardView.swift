@@ -1,6 +1,6 @@
 //
 //  SleepDataCardView.swift
-//  snoosewise
+//  SnoozeWise
 //
 //  Created by Rohan Gupta on 2/22/24.
 //
@@ -12,11 +12,11 @@ struct SleepDataCardView: View {
     
     var body: some View {
         HStack {
-            Text(data.start_time.formatDate())
+            Text(data.startTime.formatDate())
             Spacer()
-            Text(data.end_time.formatDate())
+            Text(data.endTime.formatDate())
             Spacer()
-            Text(data.stage.rawValue)
+            // Text(data.stage.rawValue)
         }
         .padding()
     }

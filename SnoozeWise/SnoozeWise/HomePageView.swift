@@ -1,6 +1,6 @@
 //
 //  Homepage.swift
-//  snoosewise
+//  SnoozeWise
 //
 //  Created by Rohan Gupta on 2/22/24.
 //

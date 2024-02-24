@@ -1,6 +1,6 @@
 //
 //  Health.swift
-//  snoosewise
+//  SnoozeWise
 //
 //  Created by Rohan Gupta on 2/22/24.
 //
@@ -9,19 +9,31 @@ import Foundation
 import HealthKit
 
 enum Stage: String, CaseIterable {
-    case awake = "Awake"
     case inBed = "In Bed"
+    case awake = "Awake"
+    case remSleep = "REM Sleep"
     case coreSleep = "Core Sleep"
     case deepSleep = "Deep Sleep"
-    case remSleep = "REM Sleep"
     case unknown = "Unknown"
+}
+
+struct StageData {
+    var startTime: Date
+    var endTime: Date
+    var duration: TimeInterval {
+        endTime.timeIntervalSince(startTime)
+    }
+    var stage: Stage
 }
 
 struct SleepData: Identifiable {
     var id = UUID()
-    var start_time: Date
-    var end_time: Date
-    var stage: Stage
+    var startTime: Date
+    var endTime: Date
+    var duration: TimeInterval {
+        endTime.timeIntervalSince(startTime)
+    }
+    var stages: [StageData]
 }
 
 extension Date {
@@ -40,33 +52,27 @@ class Health: ObservableObject {
     let healthStore = HKHealthStore()
     
     @Published var sleepData: [SleepData] = []
-    @Published var dateOfBirth: Date?
+    // @Published var dateOfBirth: Date?
     
     init() {
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
-        
-        let allTypes: Set<HKSampleType> = [
-            sleepType
-        ]
-        
-        print()
+        let allTypes: Set<HKSampleType> = [sleepType]
+
         Task {
             do {
                 try await healthStore.requestAuthorization(toShare: [], read: allTypes)
-                
                 fetchSleepAnalysis()
             } catch {
                 print("Error fetching health data: \(error.localizedDescription)")
             }
         }
     }
-    
+
     func fetchSleepAnalysis() -> Void {
-        
         let predicate = HKQuery.predicateForSamples(withStart: Date().daysBack(740), end: Date(), options: [])
-            
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
+
         let query = HKSampleQuery(sampleType: sleepType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { query, samples, error in
             guard let samples = samples as? [HKCategorySample] else {
                 if let error = error {
@@ -75,35 +81,42 @@ class Health: ObservableObject {
                 return
             }
             
-            print("START Sleep Data")
-            let sleepDataList: [SleepData] = samples.map { sample in
-                let stage: Stage
-                switch sample.value {
-                    case HKCategoryValueSleepAnalysis.awake.rawValue:
-                        stage = .awake
-                    case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
-                        stage = .coreSleep
-                    case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
-                        stage = .deepSleep
-                    case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
-                        stage = .remSleep
-                    case HKCategoryValueSleepAnalysis.inBed.rawValue:
-                        stage = .inBed
-                    default:
-                        stage = .unknown
+            print("START Fetching Sleep Data")
+            let groupedSamples = Dictionary(grouping: samples) { sample -> Date in
+                let components = Calendar.current.dateComponents([.year, .month, .day], from: sample.endDate)
+                return Calendar.current.date(from: components)!
+            }
+            
+            let sleepDataList: [SleepData] = groupedSamples.map { (date, samples) in
+                let stages = samples.map { sample -> StageData in
+                    let stage: Stage
+                    switch sample.value {
+                        case HKCategoryValueSleepAnalysis.inBed.rawValue:
+                            stage = .inBed
+                        case HKCategoryValueSleepAnalysis.awake.rawValue:
+                            stage = .awake
+                        case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
+                            stage = .remSleep
+                        case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
+                            stage = .coreSleep
+                        case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
+                            stage = .deepSleep
+                        default:
+                            stage = .unknown
+                        }
+                    return StageData(startTime: sample.startDate, endTime: sample.endDate, stage: stage)
                 }
                 
-//                print("Sleep: \(stage.rawValue) - Start: \(sample.startDate), End: \(sample.endDate)")
-                
-                return SleepData(start_time: sample.startDate, end_time: sample.endDate, stage: stage)
-            }
-            print("END Sleep Data")
-            
+                let earliestStartTime: Date = stages.min(by: { $0.startTime < $1.startTime })!.startTime
+                let latestEndTime: Date = stages.max(by: { $0.endTime < $1.endTime })!.endTime
+                return SleepData(startTime: earliestStartTime, endTime: latestEndTime, stages: stages)
+            }.sorted { $0.startTime > $1.startTime }
+            print("END Fetching Sleep Data")
+
             DispatchQueue.main.async {
                 self.sleepData = sleepDataList
             }
         }
-            
         self.healthStore.execute(query)
     }
 }

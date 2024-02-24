@@ -1,6 +1,6 @@
 //
 //  TabView.swift
-//  snoosewise
+//  SnoozeWise
 //
 //  Created by Rohan Gupta on 2/21/24.
 //

@@ -1,6 +1,6 @@
 //
 //  SleepDataView.swift
-//  snoosewise
+//  SnoozeWise
 //
 //  Created by Rohan Gupta on 2/22/24.
 //
@@ -13,23 +13,15 @@ struct SleepDataView: View {
     var body: some View {
         NavigationView{
             VStack {
-                HStack {
-                    Text("Start Time")
-                    Spacer()
-                    Text("End Time")
-                    Spacer()
-                    Text("Sleep Stage")
-                }
-                .padding(.horizontal)
-
-                Divider()
-                
                 ScrollView {
                     LazyVStack(spacing: 20) {
                         ForEach(health.sleepData.indices, id: \.self) { index in
-                            NavigationLink(destination: SleepDataCardEditView(data: $health.sleepData[index])){
-                                SleepDataCardView(data: $health.sleepData[index])
+                            NavigationLink(destination: SleepDataChartView(data: $health.sleepData[index])){
+                                SleepDataItemView(data: $health.sleepData[index])
                             }
+//                            NavigationLink(destination: SleepDataCardEditView(data: $health.sleepData[index])){
+//                                SleepDataCardView(data: $health.sleepData[index])
+//                            }
                         }
                     }
                 }
@@ -39,9 +31,3 @@ struct SleepDataView: View {
     }
 }
 
-//struct SleepDataView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        let h = Health()
-//        SnoozeTabView().environmentObject(h)
-//    }
-//}
