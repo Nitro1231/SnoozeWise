@@ -8,21 +8,21 @@
 import SwiftUI
 import Charts
 
-struct SleepDataItemView: View {
-    @Binding var data: SleepData
+struct SleepDataDayItemView: View {
+    @Binding var data: SleepDataDay
 
     var body: some View {
         VStack {
-            Text(data.endTime.formatDate(format: "MMM d, yyyy"))
+            Text(data.endDate.formatDate(format: "MMM d, yyyy"))
                 .padding()
             Chart {
-                ForEach(data.stages, id: \.startTime) { stage in
+                ForEach(data.intervals, id: \.id) { interval in
                     RuleMark(
-                        xStart: .value("Start Time", stage.startTime),
-                        xEnd: .value("End Time", stage.endTime),
+                        xStart: .value("Start Time", interval.startDate),
+                        xEnd: .value("End Time", interval.endDate),
                         y: .value("Stage", 0)
                     )
-                    .foregroundStyle(by: .value("Stage", stage.stage.rawValue))
+                    .foregroundStyle(by: .value("Stage", interval.stage.rawValue))
                     .lineStyle(StrokeStyle(lineWidth: 5))
                 }
             }

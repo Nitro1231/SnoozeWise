@@ -8,23 +8,23 @@
 import SwiftUI
 import Charts
 
-struct SleepDataChartView: View {
-    @Binding var data: SleepData
+struct SleepDataDayChartView: View {
+    @Binding var data: SleepDataDay
 
     var body: some View {
         VStack {
-            Text("Sleep Stages")
+            Text("Sleep Stages for " + data.endDate.formatDate(format: "MMM d, yyyy"))
                 .font(.headline)
                 .padding()
             Chart {
-                ForEach(data.stages, id: \.startTime) { stage in                    
+                ForEach(data.intervals, id: \.id) { interval in
                     RectangleMark(
-                        xStart: .value("Start Time", stage.startTime),
-                        xEnd: .value("End Time", stage.endTime),
-                        y: .value("Stage", stage.stage.rawValue)
+                        xStart: .value("Start Time", interval.startDate),
+                        xEnd: .value("End Time", interval.endDate),
+                        y: .value("Stage", interval.stage.rawValue)
                     )
-                    .foregroundStyle(by: .value("Stage", stage.stage.rawValue))
-                    .cornerRadius(15)
+                    .foregroundStyle(by: .value("Stage", interval.stage.rawValue))
+                    .cornerRadius(8)
                 }
             }
             .chartXAxis {

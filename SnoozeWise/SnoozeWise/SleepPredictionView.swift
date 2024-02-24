@@ -12,16 +12,21 @@ struct SleepPredictionView: View {
     @EnvironmentObject var health: Health
 
     var body: some View {
-        Text("Sleep prediction")
-//        Chart(health.sleepData) { data in
-////            AreaMark(
-//            RectangleMark(
-//                xStart: .value("Start Date", data.startTime),
-//                xEnd: .value("End Date", data.endTime),
-//                y: .value("Stage", data.stage.rawValue)
-//            )
-//        }
-//        .chartScrollTargetBehavior(.paging)
+        VStack {
+            Chart(health.sleepDataIntervals) { data in
+                RectangleMark(
+                    xStart: .value("Start Date", data.startDate),
+                    xEnd: .value("End Date", data.endDate),
+                    y: .value("Stage", data.stage.rawValue)
+                )
+                .cornerRadius(8)
+                .foregroundStyle(by: .value("Stage", data.stage.rawValue))
+                
+            }
+            .chartLegend(.hidden)
+            .chartScrollableAxes(.horizontal)
+            .chartScrollPosition(initialX: health.sleepDataIntervals[0].startDate)
+        }
     }
 }
 

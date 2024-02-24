@@ -11,29 +11,31 @@ import HealthKit
 enum Stage: String, CaseIterable {
     case inBed = "In Bed"
     case awake = "Awake"
+    case asleep = "Asleep"
     case remSleep = "REM Sleep"
     case coreSleep = "Core Sleep"
     case deepSleep = "Deep Sleep"
     case unknown = "Unknown"
 }
 
-struct StageData {
-    var startTime: Date
-    var endTime: Date
+struct SleepDataDay: Identifiable {
+    var id = UUID()
+    var startDate: Date
+    var endDate: Date
     var duration: TimeInterval {
-        endTime.timeIntervalSince(startTime)
+        endDate.timeIntervalSince(startDate)
     }
-    var stage: Stage
+    var intervals: [SleepDataInterval]
 }
 
-struct SleepData: Identifiable {
+struct SleepDataInterval: Identifiable {
     var id = UUID()
-    var startTime: Date
-    var endTime: Date
+    var startDate: Date
+    var endDate: Date
     var duration: TimeInterval {
-        endTime.timeIntervalSince(startTime)
+        endDate.timeIntervalSince(startDate)
     }
-    var stages: [StageData]
+    var stage: Stage
 }
 
 extension Date {
@@ -51,8 +53,11 @@ extension Date {
 class Health: ObservableObject {
     let healthStore = HKHealthStore()
     
-    @Published var sleepData: [SleepData] = []
-    // @Published var dateOfBirth: Date?
+    // sleep data grouped by individual intervals (decending)
+    @Published var sleepDataIntervals: [SleepDataInterval] = []
+    // sleep data grouped by day (decending)
+    @Published var sleepDataDays: [SleepDataDay] = []
+
     
     init() {
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
@@ -82,40 +87,50 @@ class Health: ObservableObject {
             }
             
             print("START Fetching Sleep Data")
-            let groupedSamples = Dictionary(grouping: samples) { sample -> Date in
+            
+            // process sleepDataIntervals
+            let sleepDataIntervalsList: [SleepDataInterval] = samples.map { sample in
+                let stage: Stage
+                switch sample.value {
+                    case HKCategoryValueSleepAnalysis.awake.rawValue:
+                        stage = .awake
+                    case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
+                        stage = .coreSleep
+                    case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
+                        stage = .deepSleep
+                    case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
+                        stage = .remSleep
+                    case HKCategoryValueSleepAnalysis.inBed.rawValue:
+                        stage = .inBed
+                    case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue:
+                        stage = .asleep
+                    default:
+                        stage = .unknown
+                }
+                
+                return SleepDataInterval(startDate: sample.startDate, endDate: sample.endDate, stage: stage)
+            }
+            
+            
+            // process sleepDataDays
+            let groupedSamplesByDay = Dictionary(grouping: sleepDataIntervalsList) { sample -> Date in
                 let components = Calendar.current.dateComponents([.year, .month, .day], from: sample.endDate)
                 return Calendar.current.date(from: components)!
             }
+            let sleepDataDayList: [SleepDataDay] = groupedSamplesByDay.map { (date, intervals) in
+                let earliestStartTime: Date = intervals.min(by: { $0.startDate < $1.startDate })!.startDate
+                let latestEndTime: Date = intervals.max(by: { $0.endDate < $1.endDate })!.endDate
+                return SleepDataDay(startDate: earliestStartTime, endDate: latestEndTime, intervals: intervals)
+            }.sorted { $0.startDate > $1.startDate }
             
-            let sleepDataList: [SleepData] = groupedSamples.map { (date, samples) in
-                let stages = samples.map { sample -> StageData in
-                    let stage: Stage
-                    switch sample.value {
-                        case HKCategoryValueSleepAnalysis.inBed.rawValue:
-                            stage = .inBed
-                        case HKCategoryValueSleepAnalysis.awake.rawValue:
-                            stage = .awake
-                        case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
-                            stage = .remSleep
-                        case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
-                            stage = .coreSleep
-                        case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
-                            stage = .deepSleep
-                        default:
-                            stage = .unknown
-                        }
-                    return StageData(startTime: sample.startDate, endTime: sample.endDate, stage: stage)
-                }
-                
-                let earliestStartTime: Date = stages.min(by: { $0.startTime < $1.startTime })!.startTime
-                let latestEndTime: Date = stages.max(by: { $0.endTime < $1.endTime })!.endTime
-                return SleepData(startTime: earliestStartTime, endTime: latestEndTime, stages: stages)
-            }.sorted { $0.startTime > $1.startTime }
+            
+            DispatchQueue.main.async {
+                self.sleepDataIntervals = sleepDataIntervalsList
+                self.sleepDataDays = sleepDataDayList
+            }
+            
             print("END Fetching Sleep Data")
 
-            DispatchQueue.main.async {
-                self.sleepData = sleepDataList
-            }
         }
         self.healthStore.execute(query)
     }

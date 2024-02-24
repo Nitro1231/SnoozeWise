@@ -15,8 +15,15 @@ struct SnoozeTabView: View {
     var body: some View {
         NavigationView {
             TabView(selection: $selected) {
-                SleepDataView()
-                    .tag("SleepData")
+                SleepDataDaysView()
+                    .tag("SleepDataDays")
+                    .tabItem{
+                        Image(systemName: "calendar")
+                    }
+                    .environmentObject(health)
+                
+                SleepDataIntervalView()
+                    .tag("SleepDataIntervals")
                     .tabItem{
                         Image(systemName: "bed.double")
                     }
@@ -36,7 +43,7 @@ struct SnoozeTabView: View {
                     }
                     .environmentObject(health)
             }
-            .navigationBarTitle("SnoozeWise", displayMode: .inline)
+            .navigationBarTitle(getNavTitle(), displayMode: .inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
@@ -47,6 +54,19 @@ struct SnoozeTabView: View {
                     .disabled(isRefreshing)
                 }
             }
+        }
+    }
+    
+    func getNavTitle() -> String {
+        switch selected {
+        case "SleepDataDays":
+            return "Sleep Days"
+        case "SleepDataIntervals":
+            return "Sleep Intervals"
+        case "SleepPrediction":
+            return "Sleep Calendar"
+        default:
+            return "SnoozeWise"
         }
     }
     
