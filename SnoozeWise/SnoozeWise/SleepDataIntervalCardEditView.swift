@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SleepDataIntervalCardEditView: View {
     @Binding var data: SleepDataInterval
-
     var body: some View {
         Form {
             // disabled start date

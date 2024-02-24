@@ -60,11 +60,11 @@ struct SnoozeTabView: View {
     func getNavTitle() -> String {
         switch selected {
         case "SleepDataDays":
-            return "Sleep Days"
+            return "Sleep Calendar"
         case "SleepDataIntervals":
             return "Sleep Intervals"
         case "SleepPrediction":
-            return "Sleep Calendar"
+            return "Sleep Chart"
         default:
             return "SnoozeWise"
         }

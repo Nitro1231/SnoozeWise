@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SleepDataIntervalCardView: View {
     @Binding var data: SleepDataInterval
+    @State private var isPresentingEditView = false
     
     var body: some View {
         HStack {
@@ -17,9 +18,29 @@ struct SleepDataIntervalCardView: View {
             Text(data.endDate.formatDate())
             Spacer()
             Text(data.stage.rawValue)
+            Spacer()
+            Button(action: {
+                self.isPresentingEditView = true
+            }) {
+                Image(systemName: "square.and.pencil")
+            }
         }
         .padding()
-        .border(Color.gray, width: 0.4)
+        .shadow(radius:10)
+        .background(Color(UIColor.secondarySystemBackground))
         .cornerRadius(10)
+        
+        .sheet(isPresented: $isPresentingEditView) {
+            NavigationStack {
+                SleepDataIntervalCardEditView(data: $data)
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") {
+                            isPresentingEditView = false
+                        }
+                    }
+                }
+            }
+        }
     }
 }

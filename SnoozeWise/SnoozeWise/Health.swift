@@ -60,12 +60,19 @@ class Health: ObservableObject {
 
     
     init() {
+        // DONT DELETE initialize dummy variables to prevent View loading errors before fetchSleepAnalysis finishes
+        let dummyInterval = SleepDataInterval(startDate:Date(), endDate:Date(), stage:Stage.awake)
+        self.sleepDataIntervals = [dummyInterval]
+        self.sleepDataDays = [SleepDataDay(startDate: Date(), endDate: Date(), intervals:[dummyInterval])]
+
+        
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
         let allTypes: Set<HKSampleType> = [sleepType]
-
+        
         Task {
             do {
                 try await healthStore.requestAuthorization(toShare: [], read: allTypes)
+                
                 fetchSleepAnalysis()
             } catch {
                 print("Error fetching health data: \(error.localizedDescription)")
@@ -124,13 +131,14 @@ class Health: ObservableObject {
             }.sorted { $0.startDate > $1.startDate }
             
             
+            
+            
             DispatchQueue.main.async {
                 self.sleepDataIntervals = sleepDataIntervalsList
                 self.sleepDataDays = sleepDataDayList
+                
+                print("END Fetching Sleep Data")
             }
-            
-            print("END Fetching Sleep Data")
-
         }
         self.healthStore.execute(query)
     }

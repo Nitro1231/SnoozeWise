@@ -13,11 +13,11 @@ struct SleepDataIntervalView: View {
     var body: some View {
         VStack {
             HStack {
-                Text("Start Date")
+                Text("Start Date").bold()
                 Spacer()
-                Text("End Date")
+                Text("End Date").bold()
                 Spacer()
-                Text("Sleep Stage")
+                Text("Sleep Stage").bold()
             }
             .padding(.horizontal)
             
@@ -26,9 +26,7 @@ struct SleepDataIntervalView: View {
             ScrollView {
                 LazyVStack(spacing: 20) {
                     ForEach(health.sleepDataIntervals.indices, id: \.self) { index in
-                        NavigationLink(destination: SleepDataIntervalCardEditView(data: $health.sleepDataIntervals[index])){
-                            SleepDataIntervalCardView(data: $health.sleepDataIntervals[index])
-                        }
+                        SleepDataIntervalCardView(data: $health.sleepDataIntervals[index])
                     }
                 }
             }
