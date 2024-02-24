@@ -48,6 +48,10 @@ extension Date {
     func daysBack(_ days: Int) -> Date {
         return Calendar.current.date(byAdding: .day, value: -days, to: self) ?? self
     }
+    
+    func minutesAgo(_ minutes: Int) -> Date {
+        return Calendar.current.date(byAdding: .minute, value: -minutes, to: self) ?? self
+    }
 }
 
 class Health: ObservableObject {
@@ -118,7 +122,6 @@ class Health: ObservableObject {
                 return SleepDataInterval(startDate: sample.startDate, endDate: sample.endDate, stage: stage)
             }
             
-            
             // process sleepDataDays
             let groupedSamplesByDay = Dictionary(grouping: sleepDataIntervalsList) { sample -> Date in
                 let components = Calendar.current.dateComponents([.year, .month, .day], from: sample.endDate)
@@ -131,9 +134,8 @@ class Health: ObservableObject {
             }.sorted { $0.startDate > $1.startDate }
             
             
-            
-            
             DispatchQueue.main.async {
+                
                 self.sleepDataIntervals = sleepDataIntervalsList
                 self.sleepDataDays = sleepDataDayList
                 

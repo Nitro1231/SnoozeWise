@@ -13,19 +13,22 @@ struct SleepPredictionView: View {
         
     var body: some View {
         VStack{
-            Chart(health.sleepDataIntervals.lazy) { data in
-                RectangleMark(
-                    xStart: .value("Start Date", data.startDate),
-                    xEnd: .value("End Hour", data.endDate),
-                    y: .value("Stage", data.stage.rawValue)
-                )
-                .cornerRadius(5)
-                .foregroundStyle(by: .value("Stage", data.stage.rawValue))
+            let maxDaysToLoad = min(3, health.sleepDataDays.count)
+            Chart(health.sleepDataDays.lazy.prefix(maxDaysToLoad)) { day in
+                ForEach(day.intervals.lazy) { interval in
+                    RectangleMark(
+                        xStart: .value("Start Date", interval.startDate),
+                        xEnd: .value("End Hour", interval.endDate),
+                        y: .value("Stage", interval.stage.rawValue)
+                    )
+                    .cornerRadius(5)
+                    .foregroundStyle(by: .value("Stage", interval.stage.rawValue))
+                }
             }
             .chartLegend(.hidden)
             .chartScrollableAxes(.horizontal)
             .chartScrollPosition(initialX: health.sleepDataIntervals[0].startDate)
-            .chartXVisibleDomain(length: 60*60*15)
+            .chartXVisibleDomain(length: 60*45)
         }
     }
 }
