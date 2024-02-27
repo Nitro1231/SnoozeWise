@@ -11,6 +11,7 @@ struct SnoozeTabView: View {
     @EnvironmentObject var health: Health
     @State var selected = "HomePage"
     @State private var isRefreshing = false
+    @State private var isPopupVisible = false
     
     var body: some View {
         NavigationView {
@@ -45,6 +46,14 @@ struct SnoozeTabView: View {
             }
             .navigationBarTitle(getNavTitle(), displayMode: .inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        isPopupVisible = true
+                    }) {
+                        Image(systemName: "gearshape")
+                    }
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         refreshData()
@@ -53,6 +62,10 @@ struct SnoozeTabView: View {
                     }
                     .disabled(isRefreshing)
                 }
+            }
+            .popover(isPresented: $isPopupVisible) {
+                SettingsPageView()
+                    .environmentObject(health)
             }
         }
     }

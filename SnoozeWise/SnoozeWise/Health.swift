@@ -170,4 +170,10 @@ class Health: ObservableObject {
         }
         self.healthStore.execute(query)
     }
+    
+    func hardReset() -> Void {
+        self.sleepDataIntervals.removeAll()
+        self.sleepDataDays.removeAll()
+        self.newLoadDate = Date().daysBack(740)
+    }
 }
