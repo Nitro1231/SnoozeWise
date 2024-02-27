@@ -18,24 +18,38 @@ enum Stage: String, CaseIterable {
     case unknown = "Unknown"
 }
 
-struct SleepDataDay: Identifiable {
+class SleepDataDay: Identifiable {
     var id = UUID()
     var startDate: Date
     var endDate: Date
+    var intervals: [SleepDataInterval]
+
     var duration: TimeInterval {
         endDate.timeIntervalSince(startDate)
     }
-    var intervals: [SleepDataInterval]
+
+    init(startDate: Date, endDate: Date, intervals: [SleepDataInterval]) {
+        self.startDate = startDate
+        self.endDate = endDate
+        self.intervals = intervals
+    }
 }
 
-struct SleepDataInterval: Identifiable {
+class SleepDataInterval: Identifiable {
     var id = UUID()
     var startDate: Date
     var endDate: Date
+    var stage: Stage
+
     var duration: TimeInterval {
         endDate.timeIntervalSince(startDate)
     }
-    var stage: Stage
+
+    init(startDate: Date, endDate: Date, stage: Stage) {
+        self.startDate = startDate
+        self.endDate = endDate
+        self.stage = stage
+    }
 }
 
 extension Date {
@@ -52,6 +66,10 @@ extension Date {
     func minutesAgo(_ minutes: Int) -> Date {
         return Calendar.current.date(byAdding: .minute, value: -minutes, to: self) ?? self
     }
+    
+    func secondsAgo(_ seconds: Int) -> Date {
+        return Calendar.current.date(byAdding: .second, value: -seconds, to: self) ?? self
+    }
 }
 
 class Health: ObservableObject {
@@ -61,15 +79,11 @@ class Health: ObservableObject {
     @Published var sleepDataIntervals: [SleepDataInterval] = []
     // sleep data grouped by day (decending)
     @Published var sleepDataDays: [SleepDataDay] = []
+    // last loaded date
+    var newLoadDate: Date = Date().daysBack(740)
 
     
     init() {
-        // DONT DELETE initialize dummy variables to prevent View loading errors before fetchSleepAnalysis finishes
-        let dummyInterval = SleepDataInterval(startDate:Date(), endDate:Date(), stage:Stage.awake)
-        self.sleepDataIntervals = [dummyInterval]
-        self.sleepDataDays = [SleepDataDay(startDate: Date(), endDate: Date(), intervals:[dummyInterval])]
-
-        
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
         let allTypes: Set<HKSampleType> = [sleepType]
         
@@ -85,7 +99,8 @@ class Health: ObservableObject {
     }
 
     func fetchSleepAnalysis() -> Void {
-        let predicate = HKQuery.predicateForSamples(withStart: Date().daysBack(740), end: Date(), options: [])
+//        print(newLoadDate.formatDate())
+        let predicate = HKQuery.predicateForSamples(withStart: newLoadDate, end: Date(), options: [])
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
 
@@ -96,45 +111,56 @@ class Health: ObservableObject {
                 }
                 return
             }
-            
+                
             print("START Fetching Sleep Data")
+//            print(samples.count)
             
             // process sleepDataIntervals
-            let sleepDataIntervalsList: [SleepDataInterval] = samples.map { sample in
+            var sleepDataIntervalsList: [SleepDataInterval] = self.sleepDataIntervals
+            for sample in samples{
                 let stage: Stage
                 switch sample.value {
-                    case HKCategoryValueSleepAnalysis.awake.rawValue:
-                        stage = .awake
-                    case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
-                        stage = .coreSleep
-                    case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
-                        stage = .deepSleep
-                    case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
-                        stage = .remSleep
-                    case HKCategoryValueSleepAnalysis.inBed.rawValue:
-                        stage = .inBed
-                    case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue:
-                        stage = .asleep
-                    default:
-                        stage = .unknown
+                case HKCategoryValueSleepAnalysis.awake.rawValue:
+                    stage = .awake
+                case HKCategoryValueSleepAnalysis.asleepCore.rawValue:
+                    stage = .coreSleep
+                case HKCategoryValueSleepAnalysis.asleepDeep.rawValue:
+                    stage = .deepSleep
+                case HKCategoryValueSleepAnalysis.asleepREM.rawValue:
+                    stage = .remSleep
+                case HKCategoryValueSleepAnalysis.inBed.rawValue:
+                    stage = .inBed
+                case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue:
+                    stage = .asleep
+                default:
+                    stage = .unknown
                 }
                 
-                return SleepDataInterval(startDate: sample.startDate, endDate: sample.endDate, stage: stage)
+                sleepDataIntervalsList.append(SleepDataInterval(startDate: sample.startDate, endDate: sample.endDate, stage: stage))
             }
+            sleepDataIntervalsList.sort { $0.startDate > $1.startDate }
             
             // process sleepDataDays
             let groupedSamplesByDay = Dictionary(grouping: sleepDataIntervalsList) { sample -> Date in
                 let components = Calendar.current.dateComponents([.year, .month, .day], from: sample.endDate)
                 return Calendar.current.date(from: components)!
             }
+            
             let sleepDataDayList: [SleepDataDay] = groupedSamplesByDay.map { (date, intervals) in
                 let earliestStartTime: Date = intervals.min(by: { $0.startDate < $1.startDate })!.startDate
                 let latestEndTime: Date = intervals.max(by: { $0.endDate < $1.endDate })!.endDate
-                return SleepDataDay(startDate: earliestStartTime, endDate: latestEndTime, intervals: intervals)
+                let object = SleepDataDay(startDate: earliestStartTime, endDate: latestEndTime, intervals: intervals)
+                
+                return object
+                
             }.sorted { $0.startDate > $1.startDate }
             
             
             DispatchQueue.main.async {
+                // set new load date
+                if(samples.count > 0){
+                    self.newLoadDate = samples[0].endDate.secondsAgo(-30)
+                }
                 
                 self.sleepDataIntervals = sleepDataIntervalsList
                 self.sleepDataDays = sleepDataDayList

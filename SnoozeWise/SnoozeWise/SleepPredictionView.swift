@@ -21,13 +21,13 @@ struct SleepPredictionView: View {
                         xEnd: .value("End Hour", interval.endDate),
                         y: .value("Stage", interval.stage.rawValue)
                     )
-                    .cornerRadius(5)
+                    .cornerRadius(9)
                     .foregroundStyle(by: .value("Stage", interval.stage.rawValue))
                 }
             }
             .chartLegend(.hidden)
             .chartScrollableAxes(.horizontal)
-            .chartScrollPosition(initialX: health.sleepDataIntervals[0].startDate)
+            .chartScrollPosition(initialX: (health.sleepDataIntervals.count == 0 ? Date() : health.sleepDataIntervals[0].endDate))
             .chartXVisibleDomain(length: 60*45)
         }
     }

@@ -36,11 +36,13 @@ struct SleepDataIntervalCardView: View {
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Done") {
+                            
                             isPresentingEditView = false
                         }
                     }
                 }
             }
+//            .interactiveDismissDisabled(true) // This disables swipe-to-dismiss
         }
     }
 }
