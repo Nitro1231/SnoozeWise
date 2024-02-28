@@ -1,5 +1,5 @@
 //
-//  Homepage.swift
+//  HomePageView.swift
 //  SnoozeWise
 //
 //  Created by Rohan Gupta on 2/22/24.

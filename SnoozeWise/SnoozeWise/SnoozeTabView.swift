@@ -1,5 +1,5 @@
 //
-//  TabView.swift
+//  SnoozeTabView.swift
 //  SnoozeWise
 //
 //  Created by Rohan Gupta on 2/21/24.
@@ -16,17 +16,17 @@ struct SnoozeTabView: View {
     var body: some View {
         NavigationView {
             TabView(selection: $selected) {
-                SleepDataDaysView()
-                    .tag("SleepDataDays")
-                    .tabItem{
-                        Image(systemName: "calendar")
-                    }
-                    .environmentObject(health)
-                
                 SleepDataIntervalView()
                     .tag("SleepDataIntervals")
                     .tabItem{
                         Image(systemName: "bed.double")
+                    }
+                    .environmentObject(health)
+                
+                SleepDataDaysView()
+                    .tag("SleepDataDays")
+                    .tabItem{
+                        Image(systemName: "calendar")
                     }
                     .environmentObject(health)
                 
@@ -40,7 +40,14 @@ struct SnoozeTabView: View {
                 SleepPredictionView()
                     .tag("SleepPrediction")
                     .tabItem{
-                        Image(systemName: "chart.line.uptrend.xyaxis")
+                        Image(systemName: "chart.bar")
+                    }
+                    .environmentObject(health)
+                
+                MLPredictionView()
+                    .tag("MLPrediction")
+                    .tabItem{
+                        Image(systemName: "chart.xyaxis.line")
                     }
                     .environmentObject(health)
             }
@@ -78,6 +85,8 @@ struct SnoozeTabView: View {
             return "Sleep Intervals"
         case "SleepPrediction":
             return "Sleep Chart"
+        case "MLPrediction":
+            return "Sleep Prediction"
         default:
             return "SnoozeWise"
         }
@@ -90,10 +99,9 @@ struct SnoozeTabView: View {
     }
 }
 
-
-struct SnoozeTabView_Previews: PreviewProvider {
-    static var previews: some View {
-        let h = Health()
-        SnoozeTabView().environmentObject(h)
-    }
-}
+//struct SnoozeTabView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        let h = Health()
+//        SnoozeTabView().environmentObject(h)
+//    }
+//}

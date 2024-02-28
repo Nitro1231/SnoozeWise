@@ -14,14 +14,13 @@ struct SleepDataDaysView: View {
         ScrollView {
             LazyVStack(spacing: 20) {
                 ForEach(health.sleepDataDays.indices, id: \.self) { index in
-                    NavigationLink(destination: SleepDataDayChartView(data: $health.sleepDataDays[index])){
-                        SleepDataDayItemView(data: $health.sleepDataDays[index])
-                    }
+                    SleepDataDayItemView(data: $health.sleepDataDays[index]).environmentObject(health)
                 }
             }
         }
         .padding()
     }
+        
 }
 
 //#Preview {

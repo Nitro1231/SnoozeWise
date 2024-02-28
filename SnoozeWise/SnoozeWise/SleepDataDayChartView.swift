@@ -1,5 +1,5 @@
 //
-//  SleepDataChartView.swift
+//  SleepDataDayChartView.swift
 //  SnoozeWise
 //
 //  Created by Jun Park on 2/23/24.
@@ -9,6 +9,7 @@ import SwiftUI
 import Charts
 
 struct SleepDataDayChartView: View {
+    @EnvironmentObject var health: Health
     @Binding var data: SleepDataDay
 
     var body: some View {
@@ -23,7 +24,7 @@ struct SleepDataDayChartView: View {
                         xEnd: .value("End Time", interval.endDate),
                         y: .value("Stage", interval.stage.rawValue)
                     )
-                    .foregroundStyle(by: .value("Stage", interval.stage.rawValue))
+                    .foregroundStyle(health.getColorForStage(interval.stage))
                     .cornerRadius(8)
                 }
             }

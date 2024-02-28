@@ -22,6 +22,7 @@ struct SettingsPageView: View {
                     isAlertVisible = true
                 }) {
                     Image(systemName: "trash")
+                        .font(.system(size: 20))
                 }
             }
             .padding(.horizontal)
@@ -39,7 +40,7 @@ struct SettingsPageView: View {
                         health.hardReset()
                     }
                 },
-                  secondaryButton: .cancel(Text("Return"))
+                secondaryButton: .cancel(Text("Return"))
             )
         }
     }

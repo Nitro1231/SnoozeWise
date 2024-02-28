@@ -7,6 +7,7 @@
 
 import Foundation
 import HealthKit
+import SwiftUI
 
 enum Stage: String, CaseIterable {
     case inBed = "In Bed"
@@ -72,18 +73,38 @@ extension Date {
     }
 }
 
+extension Color {
+    init(hex: String) {
+        let scanner = Scanner(string: hex)
+        _ = scanner.scanString("#")
+        var rgb: UInt64 = 0
+        scanner.scanHexInt64(&rgb)
+        
+        let red = Double((rgb & 0xFF0000) >> 16) / 255.0
+        let green = Double((rgb & 0x00FF00) >> 8) / 255.0
+        let blue = Double(rgb & 0x0000FF) / 255.0
+        
+        self.init(red: red, green: green, blue: blue)
+    }
+}
+
 class Health: ObservableObject {
     let healthStore = HKHealthStore()
     
     // sleep data grouped by individual intervals (decending)
     @Published var sleepDataIntervals: [SleepDataInterval] = []
+    
     // sleep data grouped by day (decending)
     @Published var sleepDataDays: [SleepDataDay] = []
+    
     // last loaded date
-    var newLoadDate: Date = Date().daysBack(740)
+    let daysToLoad = 740
+    var newLoadDate: Date
 
     
     init() {
+        newLoadDate = Date().daysBack(daysToLoad)
+        
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
         let allTypes: Set<HKSampleType> = [sleepType]
         
@@ -174,6 +195,18 @@ class Health: ObservableObject {
     func hardReset() -> Void {
         self.sleepDataIntervals.removeAll()
         self.sleepDataDays.removeAll()
-        self.newLoadDate = Date().daysBack(740)
+        self.newLoadDate = Date().daysBack(self.daysToLoad)
+    }
+    
+    func getColorForStage(_ stage: Stage) -> Color {
+        switch stage {
+        case .inBed: return .yellow
+        case .awake: return .red
+        case .asleep: return .blue
+        case .remSleep: return .purple
+        case .coreSleep: return .green
+        case .deepSleep: return .orange
+        case .unknown: return .gray
+        }
     }
 }
