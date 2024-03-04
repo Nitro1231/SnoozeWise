@@ -11,14 +11,14 @@ import Charts
 struct SleepDataDayChartView: View {
     @EnvironmentObject var health: Health
     @Binding var data: SleepDataDay
-
+    
     var body: some View {
         VStack {
             Text("Sleep Stages for " + data.endDate.formatDate(format: "MMM d, yyyy"))
                 .font(.headline)
                 .padding()
             Chart {
-                ForEach(data.intervals, id: \.id) { interval in
+                ForEach(data.intervals.sorted(by: { $0.stage < $1.stage }), id: \.id) { interval in
                     RectangleMark(
                         xStart: .value("Start Time", interval.startDate),
                         xEnd: .value("End Time", interval.endDate),

@@ -21,7 +21,7 @@ struct SleepDataDayItemView: View {
                 Text(data.endDate.formatDate(format: "MMM d, yyyy"))
                     .padding()
                 Chart {
-                    ForEach(data.intervals, id: \.id) { interval in
+                    ForEach(data.intervals.sorted(by: { $0.stage < $1.stage }), id: \.id) { interval in
                         RuleMark(
                             xStart: .value("Start Time", interval.startDate),
                             xEnd: .value("End Time", interval.endDate),
@@ -54,7 +54,6 @@ struct SleepDataDayItemView: View {
                         }
                     }
             }
-//            .interactiveDismissDisabled(true) // This disables swipe-to-dismiss
         }
     }
 }

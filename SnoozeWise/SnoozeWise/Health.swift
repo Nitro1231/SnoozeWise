@@ -19,6 +19,13 @@ enum Stage: String, CaseIterable {
     case unknown = "Unknown"
 }
 
+extension Stage: Comparable {
+    static func < (lhs: Stage, rhs: Stage) -> Bool {
+        let order: [Stage] = [.inBed, .awake, .asleep, .remSleep, .coreSleep, .deepSleep, .unknown]
+        return order.firstIndex(of: lhs)! < order.firstIndex(of: rhs)!
+    }
+}
+
 class SleepDataDay: Identifiable {
     var id = UUID()
     var startDate: Date
@@ -72,6 +79,7 @@ extension Date {
         return Calendar.current.date(byAdding: .second, value: -seconds, to: self) ?? self
     }
 }
+
 
 extension Color {
     init(hex: String) {
@@ -200,13 +208,20 @@ class Health: ObservableObject {
     
     func getColorForStage(_ stage: Stage) -> Color {
         switch stage {
-        case .inBed: return .yellow
-        case .awake: return .red
-        case .asleep: return .blue
-        case .remSleep: return .purple
-        case .coreSleep: return .green
-        case .deepSleep: return .orange
-        case .unknown: return .gray
+        case .inBed:
+            return Color(hex: "#f43c6f")
+        case .awake:
+            return Color(hex: "#ff674f")
+        case .asleep:
+            return Color(hex: "#63d2ff")
+        case .remSleep:
+            return Color(hex: "#63d2ff")
+        case .coreSleep:
+            return Color(hex: "#0983fe")
+        case .deepSleep:
+            return Color(hex: "#3634a2")
+        case .unknown:
+            return Color(hex: "#808080")
         }
     }
 }
