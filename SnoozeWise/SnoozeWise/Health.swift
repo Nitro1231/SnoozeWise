@@ -26,6 +26,11 @@ extension Stage: Comparable {
     }
 }
 
+struct StageStats{
+    var durations: [Stage: TimeInterval]
+    var ratios: [Stage: Double]
+}
+
 class SleepDataDay: Identifiable {
     var id = UUID()
     var startDate: Date
@@ -40,6 +45,23 @@ class SleepDataDay: Identifiable {
         self.startDate = startDate
         self.endDate = endDate
         self.intervals = intervals
+    }
+
+    func getStageStatistics() -> StageStats {
+        var stageDurations = [Stage: TimeInterval]()
+        let relevantStages: [Stage] = [.awake, .asleep, .remSleep, .coreSleep, .deepSleep]
+
+        for interval in intervals where relevantStages.contains(interval.stage) {
+            stageDurations[interval.stage, default: 0] += interval.duration
+        }
+
+        let totalDuration = stageDurations.values.reduce(0, +)
+        
+        var stageRatios = [Stage: Double]()
+        stageDurations.forEach { stage, duration in
+            stageRatios[stage] = totalDuration > 0 ? duration / totalDuration : 0
+        }
+        return StageStats(durations: stageDurations, ratios: stageRatios)
     }
 }
 
@@ -57,6 +79,24 @@ class SleepDataInterval: Identifiable {
         self.startDate = startDate
         self.endDate = endDate
         self.stage = stage
+    }
+}
+
+extension SleepDataDay {
+    var formattedDuration: String {
+        let durationInHours = Int(self.duration) / 3600
+        let durationInMinutes = (Int(self.duration) % 3600) / 60
+        return "\(durationInHours) hr \(durationInMinutes) min"
+    }
+    
+    var totalSleepDuration: TimeInterval {
+        intervals.filter { $0.stage == .asleep || $0.stage == .remSleep || $0.stage == .coreSleep || $0.stage == .deepSleep }.reduce(0) { $0 + $1.duration }
+    }
+    
+    var formattedTotalSleepDuration: String {
+        let durationInHours = Int(self.totalSleepDuration) / 3600
+        let durationInMinutes = (Int(self.totalSleepDuration) % 3600) / 60
+        return "\(durationInHours) hr \(durationInMinutes) min"
     }
 }
 

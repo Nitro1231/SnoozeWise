@@ -18,8 +18,23 @@ struct SleepDataDayItemView: View {
             self.isPresentingChartView = true
         }) {
             VStack {
-                Text(data.endDate.formatDate(format: "MMM d, yyyy"))
+                HStack {
+                    Text(data.endDate.formatDate(format: "MMM d, yyyy"))
+                        .font(.system(size: 20))
+                        .bold()
+                        .padding()
+                    Spacer()
+                    VStack (alignment: .trailing) {
+                        Text("Time Asleep")
+                            .font(.subheadline)
+                            .bold()
+                        Text(data.formattedTotalSleepDuration)
+                            .font(.system(size: 20))
+                    }
                     .padding()
+                    
+                }
+                .foregroundColor(.primary)
                 Chart {
                     ForEach(data.intervals.sorted(by: { $0.stage < $1.stage }), id: \.id) { interval in
                         RuleMark(
@@ -37,7 +52,7 @@ struct SleepDataDayItemView: View {
                 .cornerRadius(15)
                 .frame(height: 5)
                 .background(Color(UIColor.systemBackground))
-                .padding()
+                .padding([.horizontal, .bottom])
             }
             .background(Color(UIColor.secondarySystemBackground))
             .cornerRadius(15)
@@ -50,9 +65,9 @@ struct SleepDataDayItemView: View {
                         ToolbarItem(placement: .confirmationAction) {
                             Button("Done") {
                                 isPresentingChartView = false
-                            }
                         }
                     }
+                }
             }
         }
     }
