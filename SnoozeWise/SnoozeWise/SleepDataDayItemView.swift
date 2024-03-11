@@ -65,9 +65,9 @@ struct SleepDataDayItemView: View {
                         ToolbarItem(placement: .confirmationAction) {
                             Button("Done") {
                                 isPresentingChartView = false
+                            }
                         }
                     }
-                }
             }
         }
     }

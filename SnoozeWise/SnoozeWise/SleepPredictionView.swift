@@ -25,7 +25,7 @@ struct SleepPredictionView: View {
             }
             .padding()
             
-            let maxDaysToLoad = min(3, health.sleepDataDays.count)
+            let maxDaysToLoad = min(5, health.sleepDataDays.count)
             Chart(health.sleepDataDays.prefix(maxDaysToLoad)) { day in
                 ForEach(day.intervals) { interval in
                     RectangleMark(
@@ -41,6 +41,9 @@ struct SleepPredictionView: View {
             .chartScrollableAxes(.horizontal)
             .chartScrollPosition(initialX: (health.sleepDataIntervals.count == 0 ? Date() : health.sleepDataIntervals[0].endDate))
             .chartXVisibleDomain(length: 60*sliderValueMinutes)
+            .chartYAxis {
+                AxisMarks(preset: .automatic, position: .leading)
+            }
         }
     }
 }

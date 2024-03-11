@@ -12,6 +12,8 @@ struct SleepDataDayChartView: View {
     @EnvironmentObject var health: Health
     @Binding var data: SleepDataDay
     @State private var chartType: ChartType = .pie
+    @State private var isPresentingQualityInfoView = false
+
     
     enum ChartType: String, CaseIterable {
         case pie = "Pie Chart"
@@ -45,13 +47,23 @@ struct SleepDataDayChartView: View {
             VStack {
                 HStack {
                     VStack (alignment: .leading) {
-                        Text("Quality Score")
-                            .font(.system(size: 18))
-                            .bold()
+                        HStack {
+                            Text("Quality Score")
+                                .font(.system(size: 18))
+                                .bold()
+                            
+                            Button(action:{
+                                self.isPresentingQualityInfoView = true
+                            }){
+                                Image(systemName:"info.circle")
+                            }
+                        }
+                        
                         Text("\(String(format: "%.1f%", data.qualityScore()))")
                             .font(.system(size: 26))
                     }
                     .padding([.horizontal])
+                    
                     Spacer()
                 }
                 HStack {
@@ -64,7 +76,9 @@ struct SleepDataDayChartView: View {
                             .font(.system(size: 26))
                     }
                     .padding()
+                    
                     Spacer()
+                    
                     VStack (alignment: .leading) {
                         Text("Time Asleep")
                             .font(.system(size: 18))
@@ -74,6 +88,7 @@ struct SleepDataDayChartView: View {
                             .font(.system(size: 26))
                     }
                     .padding()
+                    
                     Spacer()
                 }
                 Chart {
@@ -117,13 +132,6 @@ struct SleepDataDayChartView: View {
                 .background(Color(UIColor.secondarySystemBackground))
                 .cornerRadius(15)
                 .padding()
-                GroupBox(label: Label("Quality Score", systemImage: "info.circle")) {
-                    Text("Our sleep quality score is a comprehensive metric, thoughtfully crafted to encapsulate the intricate dynamics of your sleep stages. By assigning weighted values to each stage—reflecting their relative contribution to restorative sleep—we offer a nuanced glimpse into the quality of your slumber. Higher scores, particularly those closer to 100, denote a sleep pattern rich in deep and REM sleep, essential for physical recuperation and cognitive restoration. Conversely, lower scores might indicate room for improvement, perhaps signaling an excess of light or disrupted sleep. It's an invitation to delve deeper into your sleep habits, understand the factors influencing your rest, and embrace strategies that enhance your sleep quality. Remember, this score is a tool for insight and improvement, guiding you toward a more restful, rejuvenating night's sleep.")
-                            .padding()
-                }
-                .background(Color(UIColor.secondarySystemBackground))
-                .cornerRadius(15)
-                .padding()
             }
         }
         .toolbar {
@@ -131,6 +139,24 @@ struct SleepDataDayChartView: View {
                 Text("Sleep Stages for " + data.endDate.formatDate(format: "MMM d, yyyy"))
                     .font(.headline)
                     .font(.system(size: 18))
+            }
+        }
+        .sheet(isPresented:$isPresentingQualityInfoView){
+            NavigationStack {
+                    GroupBox(label: Label("Quality Score", systemImage: "info.circle")) {
+                        Text("Our sleep quality score is a comprehensive metric, thoughtfully crafted to encapsulate the intricate dynamics of your sleep stages. By assigning weighted values to each stage—reflecting their relative contribution to restorative sleep—we offer a nuanced glimpse into the quality of your slumber. Higher scores, particularly those closer to 100, denote a sleep pattern rich in deep and REM sleep, essential for physical recuperation and cognitive restoration. Conversely, lower scores might indicate room for improvement, perhaps signaling an excess of light or disrupted sleep. It's an invitation to delve deeper into your sleep habits, understand the factors influencing your rest, and embrace strategies that enhance your sleep quality. Remember, this score is a tool for insight and improvement, guiding you toward a more restful, rejuvenating night's sleep.")
+                                .padding()
+                    }
+                    .background(Color(UIColor.secondarySystemBackground))
+                    .cornerRadius(15)
+                    .padding()
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") {
+                            self.isPresentingQualityInfoView = false
+                        }
+                    }
+                }
             }
         }
     }

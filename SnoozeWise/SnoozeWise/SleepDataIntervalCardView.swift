@@ -12,17 +12,36 @@ struct SleepDataIntervalCardView: View {
     @State private var isPresentingEditView = false
     
     var body: some View {
-        HStack {
-            Text(data.startDate.formatDate())
-            Spacer()
-            Text(data.endDate.formatDate())
-            Spacer()
-            Text(data.stage.rawValue)
-            Spacer()
-            Button(action: {
-                self.isPresentingEditView = true
-            }) {
-                Image(systemName: "square.and.pencil")
+        GeometryReader { geometry in
+            HStack {
+                HStack{
+                    Text(data.startDate.formatDate(format:"h:mm a"))
+                        .foregroundColor(Color(hex: "#f43c6f"))
+
+                    Spacer()
+                }
+                .frame(width: geometry.size.width / 3)
+                
+                HStack{
+                    Text(data.endDate.formatDate(format:"h:mm a"))
+                        .foregroundColor(Color(hex: "#0983fe"))
+
+                    Spacer()
+                }
+                .frame(width: geometry.size.width / 3)
+                
+                HStack {
+                    Text(data.stage.rawValue).italic()
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        self.isPresentingEditView = true
+                    }) {
+                        Image(systemName: "square.and.pencil")
+                    }
+                }
+                .frame(width: geometry.size.width / 3)
             }
         }
         .padding()
@@ -33,16 +52,14 @@ struct SleepDataIntervalCardView: View {
         .sheet(isPresented: $isPresentingEditView) {
             NavigationStack {
                 SleepDataIntervalCardEditView(data: $data)
-                .toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Done") {
-                            
-                            isPresentingEditView = false
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") {
+                                isPresentingEditView = false
+                            }
                         }
                     }
-                }
             }
-//            .interactiveDismissDisabled(true) // This disables swipe-to-dismiss
         }
     }
 }

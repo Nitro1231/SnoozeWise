@@ -169,7 +169,7 @@ struct MLPredictionView: View {
         var currentStageIndex = modelOutput.first ?? -1 // Initialize with the first stage index
         var intervalStartIndex = 0
         
-        let stages: [Stage] = [.inBed, .awake, .asleep, .remSleep, .coreSleep, .deepSleep, .unknown] // Assuming the indices match your model's output
+        let stages: [Stage] = [.inBed, .awake, .asleep, .remSleep, .coreSleep, .deepSleep, .unknown]
 
         // Iterate over the output to group contiguous minutes with the same stage
         for (index, stageIndex) in modelOutput.enumerated() {
