@@ -100,23 +100,32 @@ extension SleepDataDay {
     }
     
     func qualityScore() -> Double {
-        let weights = [Stage.deepSleep: 1.5, Stage.remSleep: 1.25, Stage.coreSleep: 1.0, Stage.asleep: 0.75, Stage.awake: -0.5, Stage.inBed: 0]
+        let weights: [Stage: Double] = [
+            .deepSleep: 1.5,
+            .remSleep: 1.25,
+            .coreSleep: 1.0,
+            .asleep: 0.75,
+            .awake: -0.5,
+            .inBed: 0
+        ]
+        
         let stageStats = getStageStatistics()
         var weightedSum: Double = 0
         var totalDuration: TimeInterval = 0
+        var totalWeight: Double = 0
         
         for (stage, duration) in stageStats.durations {
-            weightedSum += (weights[stage] ?? 0) * duration
+            weightedSum += weights[stage]! * duration
             totalDuration += duration
+            totalWeight += weights[stage]!
         }
         
-        let maxScore = totalDuration * weights.values.max()!
-        let minScore = totalDuration * weights.values.min()!
+        let maxScore = totalDuration * 1.5
+        let score = weightedSum / maxScore * 100
         
-        let score = (weightedSum - minScore) / (maxScore - minScore) * 100
-
         return max(0, min(score, 100))
     }
+
 }
 
 extension Date {
@@ -136,6 +145,18 @@ extension Date {
     
     func secondsAgo(_ seconds: Int) -> Date {
         return Calendar.current.date(byAdding: .second, value: -seconds, to: self) ?? self
+    }
+    
+    // return dayOfWeek as double (0.0 is monday, 1.0 is tuesday...)
+    func getDayOfWeek() -> Double {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.weekday], from: self)
+        if let weekday = components.weekday {
+            let dayOfWeek = Double((weekday - 2) % 7)
+            return dayOfWeek
+        } else {
+            return 0.0
+        }
     }
 }
 
@@ -187,7 +208,6 @@ class Health: ObservableObject {
     }
 
     func fetchSleepAnalysis() -> Void {
-//        print(newLoadDate.formatDate())
         let predicate = HKQuery.predicateForSamples(withStart: newLoadDate, end: Date(), options: [])
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)

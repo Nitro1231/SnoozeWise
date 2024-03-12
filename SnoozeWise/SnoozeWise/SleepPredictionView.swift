@@ -17,15 +17,15 @@ struct SleepPredictionView: View {
             VStack{
                 Text("View Size").font(.footnote)
                 HStack{
-                    Text("1/2 hour").font(.caption2)
-                    Slider(value: $sliderValueMinutes, in: 30...2*24*60, step: 30)
+                    Text("1.5 hour").font(.caption2)
+                    Slider(value: $sliderValueMinutes, in: 90...2*24*60, step: 30)
                     Text("48 hours").font(.caption2)
                 }
                 .padding(.horizontal)
             }
             .padding()
             
-            let maxDaysToLoad = min(5, health.sleepDataDays.count)
+            let maxDaysToLoad = min(3, health.sleepDataDays.count)
             Chart(health.sleepDataDays.prefix(maxDaysToLoad)) { day in
                 ForEach(day.intervals) { interval in
                     RectangleMark(

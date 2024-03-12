@@ -59,7 +59,7 @@ struct SleepDataDayItemView: View {
         }
         .sheet(isPresented: $isPresentingChartView) {
             NavigationStack {
-                SleepDataDayChartView(data: $data)
+                SleepDataDayChartView(data: data)
                     .environmentObject(health)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {

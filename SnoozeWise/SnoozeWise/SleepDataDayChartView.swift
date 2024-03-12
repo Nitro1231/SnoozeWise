@@ -10,7 +10,7 @@ import Charts
 
 struct SleepDataDayChartView: View {
     @EnvironmentObject var health: Health
-    @Binding var data: SleepDataDay
+    @State var data: SleepDataDay
     @State private var chartType: ChartType = .pie
     @State private var isPresentingQualityInfoView = false
 
