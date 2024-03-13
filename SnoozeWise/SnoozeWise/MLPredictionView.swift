@@ -22,19 +22,15 @@ struct MLPredictionView: View {
     @State private var sleepStartTime: Date?
     @State private var sleepEndTime: Date = Date()
     @State private var totalSleepHours: Double = 8
-    @State private var predictedSleepData: SleepDataDay?
+    @State private var predictedSleepData: SleepDataDay? = nil
     @State private var showPredictedChartView = false
     @State private var chartLoadedOnce = false
     @State private var addedToSleepData = false
     
     var body: some View {
         VStack {
-            DatePicker("When do you want to wake up?", selection: $sleepEndTime, in: Date()..., displayedComponents: [.hourAndMinute, .date])
+            DatePicker("When do you want to wake up?", selection: $sleepEndTime, in: Date().minutesAgo(-5)...Date().daysBack(-1), displayedComponents: [.hourAndMinute, .date])
                 .padding()
-           
-//           Stepper(value: $totalSleepHours, in: 1...12, step: 0.5) {
-//               Text("Total Sleep Hours: \(totalSleepHours, specifier: "%.1f")")
-//           }.padding()
 
            Button("Calculate Sleep Time & Predict Stages") {
                health.fetchSleepAnalysis() // reload sleep data
@@ -81,7 +77,15 @@ struct MLPredictionView: View {
                     .padding()
                     .disabled(self.addedToSleepData)
                 }
+                .onChange(of: data) {
+                    // show sheet after consecutive button clicks
+                    if(!self.chartLoadedOnce){
+                        self.showPredictedChartView = true
+                        self.chartLoadedOnce = true
+                    }
+                }
                 .onAppear(){
+                    // show sheet after first button click
                     if(!self.chartLoadedOnce){
                         self.showPredictedChartView = true
                         self.chartLoadedOnce = true
@@ -103,7 +107,7 @@ struct MLPredictionView: View {
             }
         }
         .onAppear {
-            self.sleepEndTime = Date().minutesAgo(-60)
+            self.sleepEndTime = Date().minutesAgo(-120)
             self.loadModel()
         }
     }
@@ -117,7 +121,7 @@ struct MLPredictionView: View {
     }
     
     private func reinitializeVariables() {
-        self.showPredictedChartView = true
+        self.showPredictedChartView = false
         self.chartLoadedOnce = false
         self.addedToSleepData = false
         self.predictedSleepData = nil
@@ -125,7 +129,7 @@ struct MLPredictionView: View {
     
     private func calculateSleepDuration() {
         let timeDifference = self.sleepEndTime.timeIntervalSince(Date())
-        let cappedDifference = min(timeDifference, 9 * 3600) // 9 hours in seconds
+        let cappedDifference = min(timeDifference, 9 * 3600) // in seconds
         
         let mean = cappedDifference * 0.9
         let standardDeviation = cappedDifference * 0.05

@@ -37,7 +37,7 @@ struct SnoozeTabView: View {
                     }
                     .environmentObject(health)
                 
-                SleepPredictionView()
+                SleepGraphView()
                     .tag("SleepPrediction")
                     .tabItem{
                         Image(systemName: "chart.bar")

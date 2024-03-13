@@ -1,5 +1,5 @@
 //
-//  SleepPredictionView.swift
+//  SleepGraphView.swift
 //  SnoozeWise
 //
 //  Created by Rohan Gupta on 2/22/24.
@@ -8,7 +8,7 @@
 import SwiftUI
 import Charts
 
-struct SleepPredictionView: View {
+struct SleepGraphView: View {
     @EnvironmentObject var health: Health
     @State private var sliderValueMinutes: Double = 60*24 // Initial value for the slider
         

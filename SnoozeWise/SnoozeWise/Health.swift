@@ -31,7 +31,7 @@ struct StageStats{
     var ratios: [Stage: Double]
 }
 
-class SleepDataDay: Identifiable {
+class SleepDataDay: Identifiable, Equatable {
     var id = UUID()
     var startDate: Date
     var endDate: Date
@@ -62,6 +62,10 @@ class SleepDataDay: Identifiable {
             stageRatios[stage] = totalDuration > 0 ? duration / totalDuration : 0
         }
         return StageStats(durations: stageDurations, ratios: stageRatios)
+    }
+    
+    static func == (lhs: SleepDataDay, rhs: SleepDataDay) -> Bool {
+        return lhs.startDate == rhs.startDate && lhs.intervals.count == rhs.intervals.count
     }
 }
 
