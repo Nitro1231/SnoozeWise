@@ -42,7 +42,7 @@ struct SleepDataIntervalView: View {
             
             Divider()
             
-            ScrollView {
+            ScrollView(){
                 LazyVStack(spacing: 20) {
                     ForEach(health.sleepDataDays.indices, id: \.self){ index in
                         VStack{

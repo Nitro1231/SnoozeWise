@@ -33,7 +33,7 @@ struct SleepGraphView: View {
                         xEnd: .value("End Hour", interval.endDate),
                         y: .value("Stage", interval.stage.rawValue)
                     )
-                    .cornerRadius(9)
+                    .cornerRadius(7)
                     .foregroundStyle(health.getColorForStage(interval.stage))
                 }
             }

@@ -20,7 +20,7 @@ struct MLPredictionView: View {
     @EnvironmentObject var health: Health
     @State private var model: SleepStageRandomForest?
     @State private var sleepStartTime: Date?
-    @State private var sleepEndTime: Date = Date()
+    @State private var sleepEndTime: Date = Date().minutesAgo(-60*8)
     @State private var totalSleepHours: Double = 8
     @State private var predictedSleepData: SleepDataDay? = nil
     @State private var showPredictedChartView = false
@@ -32,12 +32,12 @@ struct MLPredictionView: View {
             DatePicker("When do you want to wake up?", selection: $sleepEndTime, in: Date().minutesAgo(-5)...Date().daysBack(-1), displayedComponents: [.hourAndMinute, .date])
                 .padding()
 
-           Button("Calculate Sleep Time & Predict Stages") {
-               health.fetchSleepAnalysis() // reload sleep data
-               reinitializeVariables()
-               calculateSleepDuration()
+//           Button("Calculate Sleep Time & Predict Stages") {
+            Button("Predict an IDEAL bed time for you") {
+               health.fetchSleepAnalysis()
+               reinitializeViewVariables()
                predictSleepStages()
-           }.padding()
+            }.padding()
             
             if let sleepStartTime = self.sleepStartTime {
                 Text("You should sleep at \(sleepStartTime.formatDate(format: "h:mm a")) for the best sleep!")
@@ -72,7 +72,7 @@ struct MLPredictionView: View {
                         health.sleepDataDays.insert(data, at: 0)
                         self.addedToSleepData = true
                     }){
-                        Text(self.addedToSleepData ? "Added to Sleep Data (refresh to remove)" : "Temporarily add to Sleep Data")
+                        Text(self.addedToSleepData ? "Added to Sleep Data (refresh to remove)" : "Add this to your Sleep Data (temporary)")
                     }
                     .padding()
                     .disabled(self.addedToSleepData)
@@ -107,7 +107,6 @@ struct MLPredictionView: View {
             }
         }
         .onAppear {
-            self.sleepEndTime = Date().minutesAgo(-120)
             self.loadModel()
         }
     }
@@ -120,7 +119,7 @@ struct MLPredictionView: View {
         }
     }
     
-    private func reinitializeVariables() {
+    private func reinitializeViewVariables() {
         self.showPredictedChartView = false
         self.chartLoadedOnce = false
         self.addedToSleepData = false
@@ -129,10 +128,10 @@ struct MLPredictionView: View {
     
     private func calculateSleepDuration() {
         let timeDifference = self.sleepEndTime.timeIntervalSince(Date())
-        let cappedDifference = min(timeDifference, 9 * 3600) // in seconds
+        let cappedDifference = min(timeDifference, 8.5 * 3600) // in seconds
         
         let mean = cappedDifference * 0.9
-        let standardDeviation = cappedDifference * 0.05
+        let standardDeviation = cappedDifference * 0.15
         
         let randomNumber = Double.random(in: -1...1)
         let gaussianNumber = mean + randomNumber * standardDeviation
@@ -141,40 +140,59 @@ struct MLPredictionView: View {
         self.totalSleepHours = gaussianNumber / 3600
     }
 
-
-    
     private func predictSleepStages() {
         guard let model = model else {
-              print("ML model is not loaded.")
-              return
-          }
-                  
-          do {
-              let inputFeatures: [SleepStageRandomForestInput] = prepareInputFeatures()
+            print("ML model is not loaded.")
+            return
+        }
               
-              var stages: [Int64] = []
-              for inputFeature:SleepStageRandomForestInput in inputFeatures {
-                  let prediction: SleepStageRandomForestOutput = try model.prediction(input: inputFeature)
-                  stages.append(prediction.sleep_stage)
-              }
+        var bestPrediction: SleepDataDay = runModelIteration(model)
+        for _ in 1...5{
+            // get a gaussian prediction for totalSleepHours
+            calculateSleepDuration()
               
-              let sleepDataDay = convertStagesToSleepDataDay(stages: stages)
+            let prediction = runModelIteration(model)
+            if(prediction.qualityScore() > bestPrediction.qualityScore()){
+                bestPrediction = prediction
+            }
+        }
 
-              // update chart display
-              self.predictedSleepData = sleepDataDay
-          } catch {
-              print("Error during prediction: \(error.localizedDescription)")
-          }
+        // update chart display
+        self.predictedSleepData = bestPrediction
+        self.sleepStartTime = bestPrediction.startDate
+    }
+    
+    private func runModelIteration(_ model: SleepStageRandomForest) -> SleepDataDay {
+        do {
+            let inputFeatures: [SleepStageRandomForestInput] = prepareInputFeatures()
+            
+            var stages: [Int64] = []
+            for inputFeature:SleepStageRandomForestInput in inputFeatures {
+                let prediction: SleepStageRandomForestOutput = try model.prediction(input: inputFeature)
+                stages.append(prediction.sleep_stage)
+            }
+            
+            return convertStagesToSleepDataDay(stages: stages)
+            
+        } catch {
+            print("Error during prediction: \(error.localizedDescription)")
+            
+            let dummyDate = Date()
+            return SleepDataDay(startDate: dummyDate, endDate: dummyDate, intervals: [])
+        }
     }
     
     private func prepareInputFeatures() -> [SleepStageRandomForestInput] {
         var list: [SleepStageRandomForestInput] = []
         
         let day_of_week = self.sleepEndTime.getDayOfWeek()
-        
         let numMinutes = Int(60*self.totalSleepHours)
-        for i in 1...numMinutes {
-            list.append(SleepStageRandomForestInput(time:Double(i), day_of_week: day_of_week))
+        let currentDate = self.sleepEndTime.minutesAgo(numMinutes)
+        var start_time_counter = Double(NSCalendar(calendarIdentifier: .gregorian)!.component(.hour, from: currentDate)*60 + Calendar.current.component(.minute, from: currentDate))
+
+        for i in 0...numMinutes {
+            list.append(SleepStageRandomForestInput(start_time: start_time_counter, interval:Double(i), day_of_week: day_of_week))
+            start_time_counter += 1
         }
         
         return list
@@ -185,15 +203,15 @@ struct MLPredictionView: View {
         var currentStageIndex = stages.first ?? 0
         var intervalStartIndex = 0
         
-        self.sleepStartTime = self.sleepEndTime.minutesAgo(Int(60*self.totalSleepHours))
+        let sleepStartTime = self.sleepEndTime.minutesAgo(Int(60*self.totalSleepHours))
         let stageValues: [Stage] = [.inBed, .awake, .asleep, .remSleep, .coreSleep, .deepSleep, .unknown]
 
         // group contiguous minutes with the same stage
         for (index, stageIndex) in stages.enumerated() {
             if stageIndex != currentStageIndex {
                 if let stage = stageValues.enumerated().first(where: { $0.offset == currentStageIndex })?.element {
-                    let startDate = self.sleepStartTime!.minutesAgo(-intervalStartIndex)
-                    let endDate = self.sleepStartTime!.minutesAgo(-index)
+                    let startDate = sleepStartTime.minutesAgo(-intervalStartIndex)
+                    let endDate = sleepStartTime.minutesAgo(-index)
                     let interval = SleepDataInterval(startDate: startDate, endDate: endDate, stage: stage)
                     intervals.append(interval)
                 }
@@ -202,15 +220,16 @@ struct MLPredictionView: View {
                 intervalStartIndex = index
             }
         }
+        
         // close the last interval
         if let stage = stageValues.enumerated().first(where: { $0.offset == currentStageIndex })?.element {
-            let startDate = self.sleepStartTime!.minutesAgo(-intervalStartIndex)
-            let endDate = self.sleepStartTime!.minutesAgo(-stages.count)
+            let startDate = sleepStartTime.minutesAgo(-intervalStartIndex)
+            let endDate = sleepStartTime.minutesAgo(-stages.count)
             let interval = SleepDataInterval(startDate: startDate, endDate: endDate, stage: stage)
             intervals.append(interval)
         }
         
-        return SleepDataDay(startDate: sleepStartTime!, endDate: sleepEndTime, intervals: intervals)
+        return SleepDataDay(startDate: sleepStartTime, endDate: sleepEndTime, intervals: intervals)
     }
 }
 

@@ -104,27 +104,28 @@ extension SleepDataDay {
     }
     
     func qualityScore() -> Double {
+        
+        if self.startDate == self.endDate{
+            return 0.0
+        }
+        
         let weights: [Stage: Double] = [
-            .deepSleep: 1.5,
-            .remSleep: 1.25,
-            .coreSleep: 1.0,
-            .asleep: 0.75,
-            .awake: -0.5,
+            .deepSleep: 4,
+            .remSleep: 3,
+            .coreSleep: 2,
+            .asleep: 0,
+            .awake: -2.5,
             .inBed: 0
         ]
         
         let stageStats = getStageStatistics()
         var weightedSum: Double = 0
-        var totalDuration: TimeInterval = 0
-        var totalWeight: Double = 0
         
-        for (stage, duration) in stageStats.durations {
-            weightedSum += weights[stage]! * duration
-            totalDuration += duration
-            totalWeight += weights[stage]!
+        for (stage, ratio) in stageStats.ratios {
+            weightedSum += weights[stage]!*ratio
         }
         
-        let maxScore = totalDuration * 1.5
+        let maxScore = 0.25 * weights[Stage.deepSleep]! + 0.5 * weights[Stage.coreSleep]! + 0.25 * weights[Stage.remSleep]! // typical healthy sleep
         let score = weightedSum / maxScore * 100
         
         return max(0, min(score, 100))
