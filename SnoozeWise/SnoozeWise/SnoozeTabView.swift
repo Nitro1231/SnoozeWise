@@ -108,9 +108,11 @@ struct SnoozeTabView: View {
     private func loadData() {
         do {
             if let loadDate = UserDefaults.standard.object(forKey: "newLoadDate") as? Date,
-               let data = UserDefaults.standard.data(forKey: "sleepDataIntervals") {
+               let data = UserDefaults.standard.data(forKey: "sleepDataIntervals"),
+                let userName = UserDefaults.standard.string(forKey: "userName"){
                 health.newLoadDate = loadDate
                 health.sleepDataIntervals = try JSONDecoder().decode([SleepDataInterval].self, from: data)
+                health.userName = userName
                 print("Loaded Data")
             }
         }  catch {
@@ -123,6 +125,7 @@ struct SnoozeTabView: View {
             let data = try JSONEncoder().encode(health.sleepDataIntervals)
             UserDefaults.standard.set(data, forKey: "sleepDataIntervals")
             UserDefaults.standard.set(health.newLoadDate, forKey: "newLoadDate")
+            UserDefaults.standard.set(health.userName, forKey: "userName")
             print("Saved Data")
         } catch {
             print("Error encoding intervals: \(error.localizedDescription)")

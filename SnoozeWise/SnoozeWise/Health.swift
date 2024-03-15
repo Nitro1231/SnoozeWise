@@ -248,7 +248,7 @@ class Health: ObservableObject {
             }
             
             print("LOAD DATE: \(self.newLoadDate.formatDate()) - received \(samples.count)")
-//            print("START Fetching Sleep Data")
+            // print("START Fetching Sleep Data")
             
             // process sleepDataIntervals
             var sleepDataIntervalsList: [SleepDataInterval] = self.sleepDataIntervals
@@ -300,7 +300,7 @@ class Health: ObservableObject {
                 self.sleepDataIntervals = sleepDataIntervalsList
                 self.sleepDataDays = sleepDataDayList
                 
-//                print("END Fetching Sleep Data")
+                // print("END Fetching Sleep Data")
             }
         }
         self.healthStore.execute(query)

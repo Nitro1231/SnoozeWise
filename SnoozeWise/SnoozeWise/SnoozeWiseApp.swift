@@ -20,6 +20,7 @@ struct SnoozeWiseApp: App {
                         if UserDefaults.standard.object(forKey: "newLoadDate") != nil { // clear old data
                             UserDefaults.standard.removeObject(forKey: "newLoadDate")
                             UserDefaults.standard.removeObject(forKey: "sleepDataIntervals")
+                            UserDefaults.standard.removeObject(forKey: "userName")
                         }
                         hasLaunchedBefore = true
                     }
