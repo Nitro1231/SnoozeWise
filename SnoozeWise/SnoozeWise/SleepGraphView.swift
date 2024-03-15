@@ -25,8 +25,8 @@ struct SleepGraphView: View {
             }
             .padding()
             
-            let maxDaysToLoad = min(3, health.sleepDataDays.count)
-            Chart(health.sleepDataDays.prefix(maxDaysToLoad)) { day in
+//            let maxDaysToLoad = min(3, health.sleepDataDays.count)
+            Chart(health.sleepDataDays.prefix(3)) { day in
                 ForEach(day.intervals) { interval in
                     RectangleMark(
                         xStart: .value("Start Date", interval.startDate),

@@ -213,7 +213,7 @@ class Health: ObservableObject {
     // sleep data grouped by day (decending)
     @Published var sleepDataDays: [SleepDataDay] = []
     
-    @Published var userName: String = ""
+    @Published var userName: String = " "
     
     let initialDaysToLoad = 740 // last loaded date
     var newLoadDate: Date
@@ -311,7 +311,11 @@ class Health: ObservableObject {
             self.sleepDataIntervals.removeAll()
             self.sleepDataDays.removeAll()
             self.newLoadDate = Date().daysBack(self.initialDaysToLoad)
-            UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
+            if UserDefaults.standard.object(forKey: "newLoadDate") != nil { // clear old data
+                UserDefaults.standard.removeObject(forKey: "newLoadDate")
+                UserDefaults.standard.removeObject(forKey: "sleepDataIntervals")
+                UserDefaults.standard.removeObject(forKey: "userName")
+            }
             print("Hard Reseted Data")
         }
     }

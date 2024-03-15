@@ -13,12 +13,14 @@ struct SettingsPageView: View {
 
     var body: some View {
         VStack{
+            
             Text("Settings").font(.title)
             
             Spacer()
             
             HStack{
                 Text("HARD RESET: (This will only delete the sleep data from our app, not from your ios account) ")
+                Spacer()
                 Button(action: {
                     isAlertVisible = true
                 }) {
@@ -30,8 +32,8 @@ struct SettingsPageView: View {
             
             Spacer()
             
-            Text("Developers:").font(.title3).italic()
-            Text("Rohan Gupta and Hyunjun Park").font(.title3).italic()
+            Text("Developers:").font(.caption).bold()
+            Text("Rohan Gupta and Hyunjun Park").font(.caption).italic()
         }
         .padding()
         .alert(isPresented: $isAlertVisible){

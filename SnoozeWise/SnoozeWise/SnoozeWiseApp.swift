@@ -17,15 +17,19 @@ struct SnoozeWiseApp: App {
             SnoozeTabView()
                 .onAppear {
                     if !hasLaunchedBefore {
-                        if UserDefaults.standard.object(forKey: "newLoadDate") != nil { // clear old data
-                            UserDefaults.standard.removeObject(forKey: "newLoadDate")
-                            UserDefaults.standard.removeObject(forKey: "sleepDataIntervals")
-                            UserDefaults.standard.removeObject(forKey: "userName")
-                        }
+                        deleteUserDefaults()
                         hasLaunchedBefore = true
                     }
                 }
                 .environmentObject(health)
+        }
+    }
+    
+    func deleteUserDefaults(){
+        if UserDefaults.standard.object(forKey: "newLoadDate") != nil { // clear old data
+            UserDefaults.standard.removeObject(forKey: "newLoadDate")
+            UserDefaults.standard.removeObject(forKey: "sleepDataIntervals")
+            UserDefaults.standard.removeObject(forKey: "userName")
         }
     }
 }

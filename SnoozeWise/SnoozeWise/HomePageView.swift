@@ -13,13 +13,30 @@ struct HomePageView: View {
     @State private var nameVisible = true
     @State private var recentQualityScores: Double = -1
     @State private var isPresentingInfoView = false
-    @State private var selectedInfo = "intervals"
-
+    @State private var selectedInfo:String = "intervals"
+    
+    struct InfoButtonView: View {
+        let title: String
+        let key: String
+        @Binding var selectedInfo: String
+        @Binding var isPresentingInfoView: Bool
+        
+        var body: some View {
+            HStack {
+                Text(title)
+                Spacer()
+                Button(action:{
+                    selectedInfo = key
+                    isPresentingInfoView = true
+                }){
+                    Image(systemName:"info.circle")
+                }
+            }
+        }
+    }
     
     var body: some View {
-        VStack {
-            Spacer()
-            
+        VStack(spacing:9){
             if nameVisible {
                 Button(action: {
                     nameVisible.toggle()
@@ -32,12 +49,10 @@ struct HomePageView: View {
             } else {
                 HStack{
                     TextField("Enter your name", text: $health.userName)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-                    .font(.title)
-
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding()
+                        .font(.title)
                     Spacer()
-
                     Button("Submit"){
                         withAnimation {
                             nameVisible.toggle()
@@ -46,96 +61,58 @@ struct HomePageView: View {
                 }
             }
             
-            Spacer()
-            
             if recentQualityScores != -1{
                 HStack{
                     Text("Average Recent Quality Score:").bold().font(.title3)
                     Spacer()
                     Text("\(String(format: "%.1f%", recentQualityScores))").bold().font(.title3).foregroundColor(.secondary)
                 }
-                .padding()
+//                        .padding()
             }
+//                .padding(.vertical)
+//                .frame(height:40)
             
             if !health.sleepDataDays.isEmpty {
-                VStack{
-                    Text("Latest Sleep").bold().font(.callout).italic()
+                Section(header: Text("Latest Sleep").bold().font(.callout).italic()){
                     SleepDataDayItemView(data:$health.sleepDataDays[0]).environmentObject(health)
+                }
+                
+                Section(header: Text("Your All Time Best Sleep Days!").bold().font(.callout)) {
+                    let sortedIndices = health.sleepDataDays.indices.sorted {
+                        health.sleepDataDays[$0].qualityScore() > health.sleepDataDays[$1].qualityScore()
+                    }.prefix(8)
+                    ScrollView{
+                        LazyVStack(spacing: 10){
+                            ForEach(sortedIndices, id: \.self){ index in
+                                SleepDataDayItemView(data:$health.sleepDataDays[index]).environmentObject(health).frame(height:100).padding()
+                            }
+                        }
+                    }
+                    .border(Color.black, width:0.5)
+                    .cornerRadius(5)
+                    .padding(.horizontal)
                 }
             }
             
-            Spacer()
-            
             VStack{
-                Text("Available Features").bold()
-                List {
-                    HStack {
-                        Text("Sleep Intervals")
-                        Spacer()
-                        Button(action:{
-                            self.selectedInfo = "intervals"
-                            self.isPresentingInfoView = true
-                        }){
-                            Image(systemName:"info.circle")
-                        }
+                Section(header: Text("Available Features").bold()){
+                    List {
+                        InfoButtonView(title: "Sleep Intervals", key: "intervals", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
+                        InfoButtonView(title: "Sleep Calendar", key: "calendar", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
+                        InfoButtonView(title: "Sleep Graph", key: "graph", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
+                        InfoButtonView(title: "Sleep Prediction", key: "prediction", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
+                        InfoButtonView(title: "Hard Resetting", key: "settings", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
+                        InfoButtonView(title: "Refreshing", key: "refresh", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
                     }
-                    HStack {
-                        Text("Sleep Calendar")
-                        Spacer()
-                        Button(action:{
-                            self.selectedInfo = "calendar"
-                            self.isPresentingInfoView = true
-                        }){
-                            Image(systemName:"info.circle")
-                        }
-                    }
-                    HStack {
-                        Text("Sleep Graph")
-                        Spacer()
-                        Button(action:{
-                            self.selectedInfo = "graph"
-                            self.isPresentingInfoView = true
-                        }){
-                            Image(systemName:"info.circle")
-                        }
-                    }
-                    HStack {
-                        Text("Sleep Prediction")
-                        Spacer()
-                        Button(action:{
-                            self.selectedInfo = "prediction"
-                            self.isPresentingInfoView = true
-                        }){
-                            Image(systemName:"info.circle")
-                        }
-                    }
-                    HStack {
-                        Text("Hard Resetting")
-                        Spacer()
-                        Button(action:{
-                            self.selectedInfo = "settings"
-                            self.isPresentingInfoView = true
-                        }){
-                            Image(systemName:"info.circle")
-                        }
-                    }
-                    HStack {
-                        Text("Refreshing")
-                        Spacer()
-                        Button(action:{
-                            self.selectedInfo = "refresh"
-                            self.isPresentingInfoView = true
-                        }){
-                            Image(systemName:"info.circle")
-                        }
-                    }
+                    .listStyle(InsetGroupedListStyle())
+                    .cornerRadius(7)
                 }
-                .listStyle(InsetGroupedListStyle())
             }
         }
         .sheet(isPresented: $isPresentingInfoView){
             NavigationStack {
-                getInfoText()
+                let view = getInfoText(selectedInfo)
+                view
                     .font(.callout)
                     .background(Color(UIColor.secondarySystemBackground))
                     .cornerRadius(15)
@@ -162,19 +139,19 @@ struct HomePageView: View {
             for i in 0...maxDaysToLoad {
                 score += health.sleepDataDays[i].qualityScore()
             }
-            recentQualityScores = score / Double(health.sleepDataDays.count)
+            recentQualityScores = score / Double(maxDaysToLoad)
         }
     }
     
-    private func getInfoText() -> some View{
-        switch self.selectedInfo {
+    private func getInfoText(_ selected: String) -> some View{
+        switch selected {
         case "intervals":
             return GroupBox(label: Label("Sleep Intervals", systemImage: "info.circle")) {
                 Text("Sleep Intervals lists all the intervals we receive directly from Apple's HealthKit API. You have the option to edit them as you see fit and all the charts will update accordingly. NOTICE: Editing any data on this app has NO effect on the data stored by Apple, they are saved seperately.")
             }
         case "calendar":
             return GroupBox(label: Label("Sleep Calendar", systemImage: "info.circle")) {
-                Text("Sleep Calendar sorts your data by day and gives you the option to view sleep data for any date available and provides a variety of charts to allow you to see the distrbution of your sleep data. It also provides a Quality Score, which is a comprehensive scoring of the day's sleep.")
+                Text("Sleep Calendar sorts your data by day and gives you the option to view sleep data for any date available and provides a variety of charts to allow you to see the distribution of your sleep data. It also provides a Quality Score, which is a comprehensive scoring of the day's sleep.")
             }
         case "graph":
             return GroupBox(label: Label("Sleep Graph", systemImage: "info.circle")) {
@@ -199,6 +176,8 @@ struct HomePageView: View {
         }
     }
 }
+
+
 
 
 //struct HomepageView_Previews: PreviewProvider {

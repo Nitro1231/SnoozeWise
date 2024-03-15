@@ -31,6 +31,7 @@ struct MLPredictionView: View {
         VStack {
             DatePicker("When do you want to wake up?", selection: $sleepEndTime, in: Date().minutesAgo(-5)...Date().daysBack(-1), displayedComponents: [.hourAndMinute, .date])
                 .padding()
+                .datePickerStyle(CompactDatePickerStyle())
 
 //           Button("Calculate Sleep Time & Predict Stages") {
             Button("Predict an IDEAL bed time for you") {
