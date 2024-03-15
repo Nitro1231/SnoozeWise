@@ -9,7 +9,7 @@ import Foundation
 import HealthKit
 import SwiftUI
 
-enum Stage: String, CaseIterable {
+enum Stage: String, CaseIterable, Codable {
     case inBed = "In Bed"
     case awake = "Awake"
     case asleep = "Asleep"
@@ -69,7 +69,7 @@ class SleepDataDay: Identifiable, Equatable {
     }
 }
 
-class SleepDataInterval: Identifiable {
+class SleepDataInterval: Identifiable, Codable {
     var id = UUID()
     var startDate: Date
     var endDate: Date
@@ -83,6 +83,29 @@ class SleepDataInterval: Identifiable {
         self.startDate = startDate
         self.endDate = endDate
         self.stage = stage
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case startDate
+        case endDate
+        case stage
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        startDate = try container.decode(Date.self, forKey: .startDate)
+        endDate = try container.decode(Date.self, forKey: .endDate)
+        stage = try container.decode(Stage.self, forKey: .stage)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(startDate, forKey: .startDate)
+        try container.encode(endDate, forKey: .endDate)
+        try container.encode(stage, forKey: .stage)
     }
 }
 
@@ -190,13 +213,14 @@ class Health: ObservableObject {
     // sleep data grouped by day (decending)
     @Published var sleepDataDays: [SleepDataDay] = []
     
-    // last loaded date
-    let daysToLoad = 740
+    @Published var userName: String = ""
+    
+    let initialDaysToLoad = 740 // last loaded date
     var newLoadDate: Date
 
     
     init() {
-        newLoadDate = Date().daysBack(daysToLoad)
+        newLoadDate = Date().daysBack(initialDaysToLoad)
         
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
         let allTypes: Set<HKSampleType> = [sleepType]
@@ -204,8 +228,6 @@ class Health: ObservableObject {
         Task {
             do {
                 try await healthStore.requestAuthorization(toShare: [], read: allTypes)
-                
-                fetchSleepAnalysis()
             } catch {
                 print("Error fetching health data: \(error.localizedDescription)")
             }
@@ -224,9 +246,9 @@ class Health: ObservableObject {
                 }
                 return
             }
-                
-            print("START Fetching Sleep Data")
-//            print(samples.count)
+            
+            print("LOAD DATE: \(self.newLoadDate.formatDate()) - received \(samples.count)")
+//            print("START Fetching Sleep Data")
             
             // process sleepDataIntervals
             var sleepDataIntervalsList: [SleepDataInterval] = self.sleepDataIntervals
@@ -278,16 +300,20 @@ class Health: ObservableObject {
                 self.sleepDataIntervals = sleepDataIntervalsList
                 self.sleepDataDays = sleepDataDayList
                 
-                print("END Fetching Sleep Data")
+//                print("END Fetching Sleep Data")
             }
         }
         self.healthStore.execute(query)
     }
     
     func hardReset() -> Void {
-        self.sleepDataIntervals.removeAll()
-        self.sleepDataDays.removeAll()
-        self.newLoadDate = Date().daysBack(self.daysToLoad)
+        DispatchQueue.main.async {
+            self.sleepDataIntervals.removeAll()
+            self.sleepDataDays.removeAll()
+            self.newLoadDate = Date().daysBack(self.initialDaysToLoad)
+            UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
+            print("Hard Reseted Data")
+        }
     }
     
     func getColorForStage(_ stage: Stage) -> Color {
