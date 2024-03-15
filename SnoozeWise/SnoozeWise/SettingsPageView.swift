@@ -14,6 +14,7 @@ struct SettingsPageView: View {
     var body: some View {
         VStack{
             Text("Settings").font(.title)
+            
             Spacer()
             
             HStack{

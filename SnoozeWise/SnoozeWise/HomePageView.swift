@@ -13,7 +13,8 @@ struct HomePageView: View {
     @State private var nameVisible = true
     @State private var recentQualityScores: Double = -1
     @State private var isPresentingInfoView = false
-    @State private var selectedInfo = ""
+    @State private var selectedInfo = "intervals"
+
     
     var body: some View {
         VStack {
@@ -49,7 +50,7 @@ struct HomePageView: View {
             
             if recentQualityScores != -1{
                 HStack{
-                    Text("This Week's Quality Score:").bold().font(.title3)
+                    Text("Average Recent Quality Score:").bold().font(.title3)
                     Spacer()
                     Text("\(String(format: "%.1f%", recentQualityScores))").bold().font(.title3).foregroundColor(.secondary)
                 }
@@ -57,7 +58,10 @@ struct HomePageView: View {
             }
             
             if !health.sleepDataDays.isEmpty {
-                SleepDataDayItemView(data:$health.sleepDataDays[0]).environmentObject(health)
+                VStack{
+                    Text("Latest Sleep").bold().font(.callout).italic()
+                    SleepDataDayItemView(data:$health.sleepDataDays[0]).environmentObject(health)
+                }
             }
             
             Spacer()
@@ -69,7 +73,7 @@ struct HomePageView: View {
                         Text("Sleep Intervals")
                         Spacer()
                         Button(action:{
-                            selectedInfo = "intervals"
+                            self.selectedInfo = "intervals"
                             self.isPresentingInfoView = true
                         }){
                             Image(systemName:"info.circle")
@@ -79,7 +83,7 @@ struct HomePageView: View {
                         Text("Sleep Calendar")
                         Spacer()
                         Button(action:{
-                            selectedInfo = "calendar"
+                            self.selectedInfo = "calendar"
                             self.isPresentingInfoView = true
                         }){
                             Image(systemName:"info.circle")
@@ -89,7 +93,7 @@ struct HomePageView: View {
                         Text("Sleep Graph")
                         Spacer()
                         Button(action:{
-                            selectedInfo = "graph"
+                            self.selectedInfo = "graph"
                             self.isPresentingInfoView = true
                         }){
                             Image(systemName:"info.circle")
@@ -99,7 +103,27 @@ struct HomePageView: View {
                         Text("Sleep Prediction")
                         Spacer()
                         Button(action:{
-                            selectedInfo = "prediction"
+                            self.selectedInfo = "prediction"
+                            self.isPresentingInfoView = true
+                        }){
+                            Image(systemName:"info.circle")
+                        }
+                    }
+                    HStack {
+                        Text("Hard Resetting")
+                        Spacer()
+                        Button(action:{
+                            self.selectedInfo = "settings"
+                            self.isPresentingInfoView = true
+                        }){
+                            Image(systemName:"info.circle")
+                        }
+                    }
+                    HStack {
+                        Text("Refreshing")
+                        Spacer()
+                        Button(action:{
+                            self.selectedInfo = "refresh"
                             self.isPresentingInfoView = true
                         }){
                             Image(systemName:"info.circle")
@@ -112,6 +136,7 @@ struct HomePageView: View {
         .sheet(isPresented: $isPresentingInfoView){
             NavigationStack {
                 getInfoText()
+                    .font(.callout)
                     .background(Color(UIColor.secondarySystemBackground))
                     .cornerRadius(15)
                     .padding()
@@ -142,10 +167,10 @@ struct HomePageView: View {
     }
     
     private func getInfoText() -> some View{
-        switch selectedInfo {
+        switch self.selectedInfo {
         case "intervals":
             return GroupBox(label: Label("Sleep Intervals", systemImage: "info.circle")) {
-                Text("Sleep Intervals lists all the intervals we receive directly from Apple's HealthKit API. You have the option to edit them as you see fit and all the charts will update accordingly. IMPORTANT: Editing any data on this app has NO effect on the data stored by Apple, they are saved seperately.")
+                Text("Sleep Intervals lists all the intervals we receive directly from Apple's HealthKit API. You have the option to edit them as you see fit and all the charts will update accordingly. NOTICE: Editing any data on this app has NO effect on the data stored by Apple, they are saved seperately.")
             }
         case "calendar":
             return GroupBox(label: Label("Sleep Calendar", systemImage: "info.circle")) {
@@ -157,7 +182,15 @@ struct HomePageView: View {
             }
         case "prediction":
             return GroupBox(label: Label("Sleep Prediction", systemImage: "info.circle")) {
-                Text("Sleep Prediction gives you the opporunity to input a time you wish to wake up for the following day and we use Machine Learning algorithims to predict the MOST OPTIMAL time you should go to sleep based on your data and common healthy sleeping habits and displays how the sleep data for that sleep would look like. It also gives you the option to temporaritly add it your sleep data so you can examine it in the provided view tabs.")
+                Text("Sleep Prediction gives you the opporunity to input a time you wish to wake up for the following day and we use Machine Learning algorithims to predict the MOST OPTIMAL time you should go to sleep based on your data and common healthy sleeping habits. It displays it in our Chart view format and it also gives you the option to temporarily add it your sleep data so you can examine it in the provided view tabs.")
+            }
+        case "settings":
+            return GroupBox(label: Label("Hard Resetting", systemImage: "info.circle")) {
+                Text("Available top left. Gives you the option of Hard Resetting / deleting your data. NOTICE: This will only delete your sleep data from our app, not from your ios account.")
+            }
+        case "refresh":
+            return GroupBox(label: Label("Refreshing", systemImage: "info.circle")) {
+                Text("Available top right. Refreshes the sleep data, while maintaining any edits made.")
             }
         default:
             return GroupBox(label: Label("", systemImage: "info.circle")) {
