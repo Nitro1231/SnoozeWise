@@ -22,21 +22,26 @@ struct HomePageView: View {
         @Binding var isPresentingInfoView: Bool
         
         var body: some View {
-            HStack {
-                Text(title)
-                Spacer()
-                Button(action:{
-                    selectedInfo = key
-                    isPresentingInfoView = true
-                }){
-                    Image(systemName:"info.circle")
+            VStack {
+                HStack {
+                    Button(action:{
+                        selectedInfo = key
+                        isPresentingInfoView = true
+                    }){
+                        Text(title)
+                        Spacer()
+                        Image(systemName:"info.circle")
+                    }
                 }
+                .padding()
             }
+            .background(Color(UIColor.secondarySystemBackground))
+            .cornerRadius(10)
         }
     }
     
     var body: some View {
-        VStack(spacing:9){
+        VStack(spacing: 10) {
             if nameVisible {
                 Button(action: {
                     nameVisible.toggle()
@@ -61,52 +66,41 @@ struct HomePageView: View {
                 }
             }
             
-            if recentQualityScores != -1{
-                HStack{
-                    Text("Average Recent Quality Score:").bold().font(.title3)
-                    Spacer()
-                    Text("\(String(format: "%.1f%", recentQualityScores))").bold().font(.title3).foregroundColor(.secondary)
-                }
-//                        .padding()
-            }
-//                .padding(.vertical)
-//                .frame(height:40)
-            
-            if !health.sleepDataDays.isEmpty {
-                Section(header: Text("Latest Sleep").bold().font(.callout).italic()){
-                    SleepDataDayItemView(data:$health.sleepDataDays[0]).environmentObject(health)
+            ScrollView {
+                if recentQualityScores != -1 {
+                    HStack{
+                        Text("Average Recent Quality Score:").bold().font(.title3)
+                        Spacer()
+                        Text("\(String(format: "%.1f%", recentQualityScores))").bold().font(.title3).foregroundColor(.secondary)
+                    }.padding(.top)
                 }
                 
-                Section(header: Text("Your All Time Best Sleep Days!").bold().font(.callout)) {
+                if !health.sleepDataDays.isEmpty {
+                    Text("Latest Sleep").bold().font(.callout).italic().padding(.top)
+                    SleepDataDayItemView(data:$health.sleepDataDays[0]).environmentObject(health)
+                    
+                    Text("Your All Time Best Sleep Days!").bold().font(.callout).padding(.top)
                     let sortedIndices = health.sleepDataDays.indices.sorted {
                         health.sleepDataDays[$0].qualityScore() > health.sleepDataDays[$1].qualityScore()
-                    }.prefix(8)
-                    ScrollView{
-                        LazyVStack(spacing: 10){
-                            ForEach(sortedIndices, id: \.self){ index in
-                                SleepDataDayItemView(data:$health.sleepDataDays[index]).environmentObject(health).frame(height:100).padding()
-                            }
+                    }.prefix(5)
+                    LazyVStack(spacing: 10){
+                        ForEach(sortedIndices, id: \.self){ index in
+                            SleepDataDayItemView(data:$health.sleepDataDays[index])
+                                .environmentObject(health)
+                                .padding(.horizontal)
                         }
                     }
-                    .border(Color.black, width:0.5)
-                    .cornerRadius(5)
-                    .padding(.horizontal)
                 }
-            }
-            
-            VStack{
-                Section(header: Text("Available Features").bold()){
-                    List {
-                        InfoButtonView(title: "Sleep Intervals", key: "intervals", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
-                        InfoButtonView(title: "Sleep Calendar", key: "calendar", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
-                        InfoButtonView(title: "Sleep Graph", key: "graph", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
-                        InfoButtonView(title: "Sleep Prediction", key: "prediction", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
-                        InfoButtonView(title: "Hard Resetting", key: "settings", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
-                        InfoButtonView(title: "Refreshing", key: "refresh", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
-                    }
-                    .listStyle(InsetGroupedListStyle())
-                    .cornerRadius(7)
-                }
+                
+                Text("Available Features").bold().font(.callout).padding(.top)
+                VStack(spacing: 10, content: {
+                    InfoButtonView(title: "Sleep Intervals", key: "intervals", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
+                    InfoButtonView(title: "Sleep Calendar", key: "calendar", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
+                    InfoButtonView(title: "Sleep Graph", key: "graph", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
+                    InfoButtonView(title: "Sleep Prediction", key: "prediction", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
+                    InfoButtonView(title: "Hard Resetting", key: "settings", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
+                    InfoButtonView(title: "Refreshing", key: "refresh", selectedInfo: $selectedInfo, isPresentingInfoView: $isPresentingInfoView)
+                })
             }
         }
         .sheet(isPresented: $isPresentingInfoView){
@@ -130,6 +124,7 @@ struct HomePageView: View {
         .onChange(of: health.sleepDataDays) {
             setRecentQualityScores()
         }
+        
     }
     
     private func setRecentQualityScores(){
@@ -139,7 +134,7 @@ struct HomePageView: View {
             for i in 0...maxDaysToLoad {
                 score += health.sleepDataDays[i].qualityScore()
             }
-            recentQualityScores = score / Double(maxDaysToLoad)
+            recentQualityScores = score / Double(maxDaysToLoad + 1)
         }
     }
     
