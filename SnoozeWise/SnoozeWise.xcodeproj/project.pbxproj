@@ -30,6 +30,7 @@
 		28A82D6B2B89D19900E1E7CF /* SleepDataDayItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataDayItemView.swift; sourceTree = "<group>"; };
 		7E0F177F2B8F1DAB00BD405B /* MLPredictionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLPredictionView.swift; sourceTree = "<group>"; };
 		7E2454122BA0E69100C88AD1 /* SleepStageRandomForest.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = SleepStageRandomForest.mlmodel; path = ../../ML/SleepStageRandomForest.mlmodel; sourceTree = "<group>"; };
+		7E5A32052BA529210099746E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7E850BBF2B88149D00E25E1D /* SnoozeWise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnoozeWise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E850BC22B88149D00E25E1D /* SnoozeWiseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeWiseApp.swift; sourceTree = "<group>"; };
 		7E850BC62B8814A000E25E1D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -76,6 +77,7 @@
 		7E850BC12B88149D00E25E1D /* SnoozeWise */ = {
 			isa = PBXGroup;
 			children = (
+				7E5A32052BA529210099746E /* Info.plist */,
 				7E850BDE2B8815DA00E25E1D /* SnoozeWise.entitlements */,
 				7E850BC22B88149D00E25E1D /* SnoozeWiseApp.swift */,
 				7E850BD02B8814F400E25E1D /* Health.swift */,
@@ -328,9 +330,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SnoozeWise/Preview Content\"";
-				DEVELOPMENT_TEAM = 8NVWF4DRP7;
+				DEVELOPMENT_TEAM = DCXKK746R9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SnoozeWise/Info.plist;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data for our features.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -343,7 +346,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = edu.uci;
+				PRODUCT_BUNDLE_IDENTIFIER = com.guptarohan2003;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -360,9 +363,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SnoozeWise/Preview Content\"";
-				DEVELOPMENT_TEAM = 8NVWF4DRP7;
+				DEVELOPMENT_TEAM = DCXKK746R9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SnoozeWise/Info.plist;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data for our features.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -375,7 +379,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = edu.uci;
+				PRODUCT_BUNDLE_IDENTIFIER = com.guptarohan2003;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

@@ -36,15 +36,17 @@ class SleepDataDay: Identifiable, Equatable {
     var startDate: Date
     var endDate: Date
     var intervals: [SleepDataInterval]
+    var heartRateIntervals: [HeartRateInterval]
 
     var duration: TimeInterval {
         endDate.timeIntervalSince(startDate)
     }
 
-    init(startDate: Date, endDate: Date, intervals: [SleepDataInterval]) {
+    init(startDate: Date, endDate: Date, intervals: [SleepDataInterval], heartRateIntervals: [HeartRateInterval]) {
         self.startDate = startDate
         self.endDate = endDate
         self.intervals = intervals
+        self.heartRateIntervals = heartRateIntervals
     }
 
     func getStageStatistics() -> StageStats {
@@ -67,7 +69,91 @@ class SleepDataDay: Identifiable, Equatable {
     static func == (lhs: SleepDataDay, rhs: SleepDataDay) -> Bool {
         return lhs.startDate == rhs.startDate && lhs.intervals.count == rhs.intervals.count
     }
+
+    var formattedDuration: String {
+        let durationInHours = Int(self.duration) / 3600
+        let durationInMinutes = (Int(self.duration) % 3600) / 60
+        return "\(durationInHours) hr \(durationInMinutes) min"
+    }
+    
+    var totalSleepDuration: TimeInterval {
+        intervals.filter { $0.stage == .asleep || $0.stage == .remSleep || $0.stage == .coreSleep || $0.stage == .deepSleep }.reduce(0) { $0 + $1.duration }
+    }
+    
+    var formattedTotalSleepDuration: String {
+        let durationInHours = Int(self.totalSleepDuration) / 3600
+        let durationInMinutes = (Int(self.totalSleepDuration) % 3600) / 60
+        return "\(durationInHours) hr \(durationInMinutes) min"
+    }
+    
+    func qualityScore() -> Double {
+        if self.startDate == self.endDate{
+            return 0.0
+        }
+        
+        let weights: [Stage: Double] = [
+            .deepSleep: 4,
+            .remSleep: 3,
+            .coreSleep: 2,
+            .asleep: 0,
+            .awake: -2.5,
+            .inBed: 0
+        ]
+        
+        let stageStats = getStageStatistics()
+        var weightedSum: Double = 0
+        
+        for (stage, ratio) in stageStats.ratios {
+            weightedSum += weights[stage]!*ratio
+        }
+        
+        let maxScore = 0.25 * weights[Stage.deepSleep]! + 0.5 * weights[Stage.coreSleep]! + 0.25 * weights[Stage.remSleep]! // typical healthy sleep
+        let score = weightedSum / maxScore * 100
+        
+        return max(0, min(score, 100))
+    }
 }
+
+class HeartRateInterval: Identifiable, Codable {
+    var id = UUID()
+    var startDate: Date
+    var endDate: Date
+    var bpm: Double
+
+    var duration: TimeInterval {
+        endDate.timeIntervalSince(startDate)
+    }
+
+    init(startDate: Date, endDate: Date, bpm: Double) {
+        self.startDate = startDate
+        self.endDate = endDate
+        self.bpm = bpm
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case startDate
+        case endDate
+        case bpm
+    }
+
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        startDate = try container.decode(Date.self, forKey: .startDate)
+        endDate = try container.decode(Date.self, forKey: .endDate)
+        bpm = try container.decode(Double.self, forKey: .bpm)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(startDate, forKey: .startDate)
+        try container.encode(endDate, forKey: .endDate)
+        try container.encode(bpm, forKey: .bpm)
+    }
+}
+
 
 class SleepDataInterval: Identifiable, Codable {
     var id = UUID()
@@ -109,53 +195,6 @@ class SleepDataInterval: Identifiable, Codable {
     }
 }
 
-extension SleepDataDay {
-    var formattedDuration: String {
-        let durationInHours = Int(self.duration) / 3600
-        let durationInMinutes = (Int(self.duration) % 3600) / 60
-        return "\(durationInHours) hr \(durationInMinutes) min"
-    }
-    
-    var totalSleepDuration: TimeInterval {
-        intervals.filter { $0.stage == .asleep || $0.stage == .remSleep || $0.stage == .coreSleep || $0.stage == .deepSleep }.reduce(0) { $0 + $1.duration }
-    }
-    
-    var formattedTotalSleepDuration: String {
-        let durationInHours = Int(self.totalSleepDuration) / 3600
-        let durationInMinutes = (Int(self.totalSleepDuration) % 3600) / 60
-        return "\(durationInHours) hr \(durationInMinutes) min"
-    }
-    
-    func qualityScore() -> Double {
-        
-        if self.startDate == self.endDate{
-            return 0.0
-        }
-        
-        let weights: [Stage: Double] = [
-            .deepSleep: 4,
-            .remSleep: 3,
-            .coreSleep: 2,
-            .asleep: 0,
-            .awake: -2.5,
-            .inBed: 0
-        ]
-        
-        let stageStats = getStageStatistics()
-        var weightedSum: Double = 0
-        
-        for (stage, ratio) in stageStats.ratios {
-            weightedSum += weights[stage]!*ratio
-        }
-        
-        let maxScore = 0.25 * weights[Stage.deepSleep]! + 0.5 * weights[Stage.coreSleep]! + 0.25 * weights[Stage.remSleep]! // typical healthy sleep
-        let score = weightedSum / maxScore * 100
-        
-        return max(0, min(score, 100))
-    }
-
-}
-
 extension Date {
     func formatDate(format: String = "MMM d, yyyy h:mm a") -> String {
         let formatter = DateFormatter()
@@ -175,7 +214,7 @@ extension Date {
         return Calendar.current.date(byAdding: .second, value: -seconds, to: self) ?? self
     }
     
-    // return dayOfWeek as double (0.0 is monday, 1.0 is tuesday...)
+    // return dayOfWeek as double (0 is monday, 1 is tuesday...)
     func getDayOfWeek() -> Double {
         let calendar = Calendar.current
         let components = calendar.dateComponents([.weekday], from: self)
@@ -207,23 +246,22 @@ extension Color {
 class Health: ObservableObject {
     let healthStore = HKHealthStore()
     
-    // sleep data grouped by individual intervals (decending)
     @Published var sleepDataIntervals: [SleepDataInterval] = []
-    
-    // sleep data grouped by day (decending)
     @Published var sleepDataDays: [SleepDataDay] = []
+    @Published var heartRateIntervals: [HeartRateInterval] = []
     
-    @Published var userName: String = " "
+    @Published var userName: String = ""
     
-    let initialDaysToLoad = 740 // last loaded date
-    var newLoadDate: Date
+    let initialDaysToLoad = 740
+    var newLoadDate: Date // last loaded date
 
     
     init() {
         newLoadDate = Date().daysBack(initialDaysToLoad)
         
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
-        let allTypes: Set<HKSampleType> = [sleepType]
+        let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate)!
+        let allTypes: Set<HKSampleType> = [sleepType, heartRateType]
         
         Task {
             do {
@@ -233,8 +271,51 @@ class Health: ObservableObject {
             }
         }
     }
+    
+    func fetchAnalysis() {
+        let group = DispatchGroup()
+        
+        group.enter()
+        fetchSleepAnalysis {
+            group.leave()
+        }
+        
+        group.enter()
+        fetchHeartRateAnalysis {
+            group.leave()
+        }
+        
+        group.notify(queue: .main) {
+            self.setSleepDataDays()
+        }
+    }
+    
+    func setSleepDataDays(){
+        let groupedSleepSamplesByDay = Dictionary(grouping: self.sleepDataIntervals) { sample -> Date in
+            let components = Calendar.current.dateComponents([.year, .month, .day], from: sample.endDate)
+            return Calendar.current.date(from: components)!
+        }
+        let groupedHRSamplesByDay = Dictionary(grouping: self.heartRateIntervals) { sample -> Date in
+            let components = Calendar.current.dateComponents([.year, .month, .day], from: sample.endDate)
+            return Calendar.current.date(from: components)!
+        }
+        
+        let sleepDataDayList: [SleepDataDay] = groupedSleepSamplesByDay.map { (date, intervals) in
+            let earliestStartTime: Date = intervals.min(by: { $0.startDate < $1.startDate })!.startDate
+            let latestEndTime: Date = intervals.max(by: { $0.endDate < $1.endDate })!.endDate
+            let hrIntervals = groupedHRSamplesByDay[date] ?? [HeartRateInterval]()
+            return SleepDataDay(startDate: earliestStartTime, endDate: latestEndTime, intervals: intervals, heartRateIntervals: hrIntervals)
+        }.sorted { $0.startDate > $1.startDate }
+        
+        DispatchQueue.main.async {
+            self.sleepDataDays = sleepDataDayList
+            if(sleepDataDayList.count > 0){
+                self.newLoadDate = self.sleepDataDays[0].endDate.secondsAgo(-30)  // set new load date
+            }
+        }
+    }
 
-    func fetchSleepAnalysis() -> Void {
+    func fetchSleepAnalysis(completion: @escaping () -> Void) -> Void {
         let predicate = HKQuery.predicateForSamples(withStart: newLoadDate, end: Date(), options: [])
         let sleepType = HKObjectType.categoryType(forIdentifier: .sleepAnalysis)!
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
@@ -247,10 +328,8 @@ class Health: ObservableObject {
                 return
             }
             
-            print("LOAD DATE: \(self.newLoadDate.formatDate()) - received \(samples.count)")
-            // print("START Fetching Sleep Data")
-            
-            // process sleepDataIntervals
+            print("LOAD DATE: \(self.newLoadDate.formatDate()) - received \(samples.count) (SLEEP ANALYSIS)")
+                        
             var sleepDataIntervalsList: [SleepDataInterval] = self.sleepDataIntervals
             for sample in samples{
                 let stage: Stage
@@ -275,36 +354,44 @@ class Health: ObservableObject {
             }
             sleepDataIntervalsList.sort { $0.startDate > $1.startDate }
             
-            // process sleepDataDays
-            let groupedSamplesByDay = Dictionary(grouping: sleepDataIntervalsList) { sample -> Date in
-                let components = Calendar.current.dateComponents([.year, .month, .day], from: sample.endDate)
-                return Calendar.current.date(from: components)!
-            }
-            
-            let sleepDataDayList: [SleepDataDay] = groupedSamplesByDay.map { (date, intervals) in
-                let earliestStartTime: Date = intervals.min(by: { $0.startDate < $1.startDate })!.startDate
-                let latestEndTime: Date = intervals.max(by: { $0.endDate < $1.endDate })!.endDate
-                let object = SleepDataDay(startDate: earliestStartTime, endDate: latestEndTime, intervals: intervals)
-                
-                return object
-                
-            }.sorted { $0.startDate > $1.startDate }
-            
-            
             DispatchQueue.main.async {
-                // set new load date
-                if(samples.count > 0){
-                    self.newLoadDate = samples[0].endDate.secondsAgo(-30)
-                }
-                
                 self.sleepDataIntervals = sleepDataIntervalsList
-                self.sleepDataDays = sleepDataDayList
-                
-                // print("END Fetching Sleep Data")
+                completion()
             }
         }
         self.healthStore.execute(query)
     }
+
+    func fetchHeartRateAnalysis(completion: @escaping () -> Void) {
+        let end = sleepDataIntervals.count > 0 ? sleepDataIntervals[0].endDate : self.newLoadDate
+        
+        let predicate = HKQuery.predicateForSamples(withStart: self.newLoadDate, end: end, options: [])
+        let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate)!
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
+        let query = HKSampleQuery(sampleType: heartRateType, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: [sortDescriptor]) { (query, samples, error) in
+            guard let heartRateSamples = samples as? [HKQuantitySample], error == nil else {
+                if let error = error {
+                    print("Error fetching heart rate data: \(error.localizedDescription)")
+                }
+                return
+            }
+            
+            print("LOAD DATE: \(self.newLoadDate.formatDate()) - received \(heartRateSamples.count) (HEART RATE)")
+
+            var heartRateIntervals: [HeartRateInterval] = self.heartRateIntervals
+            for sample in heartRateSamples {
+                heartRateIntervals.append(HeartRateInterval(startDate: sample.startDate, endDate: sample.endDate, bpm: sample.quantity.doubleValue(for: HKUnit(from: "count/min"))))
+            }
+            heartRateIntervals.sort { $0.startDate > $1.startDate }
+            
+            DispatchQueue.main.async {
+                self.heartRateIntervals = heartRateIntervals
+                completion()
+            }
+        }
+        self.healthStore.execute(query)
+    }
+
     
     func hardReset() -> Void {
         DispatchQueue.main.async {
@@ -314,6 +401,7 @@ class Health: ObservableObject {
             if UserDefaults.standard.object(forKey: "newLoadDate") != nil { // clear old data
                 UserDefaults.standard.removeObject(forKey: "newLoadDate")
                 UserDefaults.standard.removeObject(forKey: "sleepDataIntervals")
+                UserDefaults.standard.removeObject(forKey: "heartRateIntervals")
                 UserDefaults.standard.removeObject(forKey: "userName")
             }
             print("Hard Reseted Data")

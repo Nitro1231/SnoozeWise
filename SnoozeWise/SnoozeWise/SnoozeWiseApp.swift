@@ -17,7 +17,8 @@ struct SnoozeWiseApp: App {
             SnoozeTabView()
                 .onAppear {
                     if !hasLaunchedBefore {
-                        deleteUserDefaults()
+//                        deleteUserDefaults()
+                        health.hardReset()
                         hasLaunchedBefore = true
                     }
                 }
@@ -25,11 +26,11 @@ struct SnoozeWiseApp: App {
         }
     }
     
-    func deleteUserDefaults(){
-        if UserDefaults.standard.object(forKey: "newLoadDate") != nil { // clear old data
-            UserDefaults.standard.removeObject(forKey: "newLoadDate")
-            UserDefaults.standard.removeObject(forKey: "sleepDataIntervals")
-            UserDefaults.standard.removeObject(forKey: "userName")
-        }
-    }
+//    func deleteUserDefaults(){
+//        if UserDefaults.standard.object(forKey: "newLoadDate") != nil { // clear old data
+//            UserDefaults.standard.removeObject(forKey: "newLoadDate")
+//            UserDefaults.standard.removeObject(forKey: "sleepDataIntervals")
+//            UserDefaults.standard.removeObject(forKey: "userName")
+//        }
+//    }
 }

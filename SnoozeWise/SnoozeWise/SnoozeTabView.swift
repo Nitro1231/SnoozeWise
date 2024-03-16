@@ -101,17 +101,19 @@ struct SnoozeTabView: View {
     
     private func refreshData() {
         isRefreshing = true
-        health.fetchSleepAnalysis()
+        health.fetchAnalysis()
         isRefreshing = false
     }
     
     private func loadData() {
         do {
             if let loadDate = UserDefaults.standard.object(forKey: "newLoadDate") as? Date,
-               let data = UserDefaults.standard.data(forKey: "sleepDataIntervals"),
-                let userName = UserDefaults.standard.string(forKey: "userName"){
+                let sleepData = UserDefaults.standard.data(forKey: "sleepDataIntervals"),
+                 let heartRateData = UserDefaults.standard.data(forKey: "heartRateIntervals"),
+                  let userName = UserDefaults.standard.string(forKey: "userName"){
                 health.newLoadDate = loadDate
-                health.sleepDataIntervals = try JSONDecoder().decode([SleepDataInterval].self, from: data)
+                health.sleepDataIntervals = try JSONDecoder().decode([SleepDataInterval].self, from: sleepData)
+                health.heartRateIntervals = try JSONDecoder().decode([HeartRateInterval].self, from: heartRateData)
                 health.userName = userName
                 print("Loaded Data")
             }
@@ -122,8 +124,10 @@ struct SnoozeTabView: View {
     
     private func saveData() {
         do {
-            let data = try JSONEncoder().encode(health.sleepDataIntervals)
-            UserDefaults.standard.set(data, forKey: "sleepDataIntervals")
+            let sleepData = try JSONEncoder().encode(health.sleepDataIntervals)
+            let heartRateData = try JSONEncoder().encode(health.heartRateIntervals)
+            UserDefaults.standard.set(sleepData, forKey: "sleepDataIntervals")
+            UserDefaults.standard.set(heartRateData, forKey: "heartRateIntervals")
             UserDefaults.standard.set(health.newLoadDate, forKey: "newLoadDate")
             UserDefaults.standard.set(health.userName, forKey: "userName")
             print("Saved Data")

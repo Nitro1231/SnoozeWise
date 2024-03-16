@@ -33,11 +33,10 @@ struct MLPredictionView: View {
                 .padding()
                 .datePickerStyle(CompactDatePickerStyle())
 
-//           Button("Calculate Sleep Time & Predict Stages") {
             Button("Predict an IDEAL bed time for you") {
-               health.fetchSleepAnalysis()
-               reinitializeViewVariables()
-               predictSleepStages()
+                health.fetchAnalysis()
+                reinitializeViewVariables()
+                predictSleepStages()
             }.padding()
             
             if let sleepStartTime = self.sleepStartTime {
@@ -137,7 +136,7 @@ struct MLPredictionView: View {
         let randomNumber = Double.random(in: -1...1)
         let gaussianNumber = mean + randomNumber * standardDeviation
         
-        print("timeDifference: \(cappedDifference / 3600), estimated sleep hours: \(gaussianNumber / 3600)")
+//        print("timeDifference: \(cappedDifference / 3600), estimated sleep hours: \(gaussianNumber / 3600)")
         self.totalSleepHours = gaussianNumber / 3600
     }
 
@@ -179,7 +178,7 @@ struct MLPredictionView: View {
             print("Error during prediction: \(error.localizedDescription)")
             
             let dummyDate = Date()
-            return SleepDataDay(startDate: dummyDate, endDate: dummyDate, intervals: [])
+            return SleepDataDay(startDate: dummyDate, endDate: dummyDate, intervals: [], heartRateIntervals: [HeartRateInterval]())
         }
     }
     
@@ -230,7 +229,7 @@ struct MLPredictionView: View {
             intervals.append(interval)
         }
         
-        return SleepDataDay(startDate: sleepStartTime, endDate: sleepEndTime, intervals: intervals)
+        return SleepDataDay(startDate: sleepStartTime, endDate: sleepEndTime, intervals: intervals, heartRateIntervals: [HeartRateInterval]())
     }
 }
 
