@@ -10,25 +10,58 @@ import Charts
 import CoreML
 
 
-struct SleepStagePrediction {
-    var stage: String
-    var startTime: Date
-    var endTime: Date
-}
+//struct SleepStagePrediction {
+//    var stage: String
+//    var startTime: Date
+//    var endTime: Date
+//}
 
 struct MLPredictionView: View {
     @EnvironmentObject var health: Health
     @State private var model: SleepStageRandomForest?
     @State private var sleepStartTime: Date?
-    @State private var sleepEndTime: Date = Date().minutesAgo(-60*8)
+    @State private var sleepEndTime: Date = Date().minutesAgo(-60*10)
     @State private var totalSleepHours: Double = 8
     @State private var predictedSleepData: SleepDataDay? = nil
     @State private var showPredictedChartView = false
     @State private var chartLoadedOnce = false
     @State private var addedToSleepData = false
+    @State private var selectedHours = 0
+    @State private var selectedMinutes = 0
+    @State private var follow = true
     
     var body: some View {
         VStack {
+            VStack {
+                Toggle("Follow this?", isOn: $follow)
+                    .font(.callout).frame(height:35)
+                HStack{
+                    HStack{
+                        if follow {
+                            Text("Your Usual Sleep Duration").font(.callout)
+                        } else {
+                            Text("Provide a General Desired Amount of Sleep").font(.callout)
+                        }
+                        Spacer()
+                    }.minimumScaleFactor(0.5)
+                    Spacer()
+                    VStack {
+                        Stepper(value: $selectedHours, in: 0...23){
+                            Text("\(selectedHours) hrs").bold().font(.caption)
+                        }
+                        
+                        Stepper(value: $selectedMinutes, in: 0...59){
+                            Text("\(selectedMinutes) min").bold().font(.caption)
+                        }
+                    }
+                    .frame(width: 150)
+                    .disabled(follow)
+                }
+            }
+            .padding()
+            
+            Divider()
+            
             DatePicker("When do you want to wake up?", selection: $sleepEndTime, in: Date().minutesAgo(-5)...Date().daysBack(-1), displayedComponents: [.hourAndMinute, .date])
                 .padding()
                 .datePickerStyle(CompactDatePickerStyle())
@@ -40,7 +73,7 @@ struct MLPredictionView: View {
             }.padding()
             
             if let sleepStartTime = self.sleepStartTime {
-                Text("You should sleep at \(sleepStartTime.formatDate(format: "h:mm a")) for the best sleep!")
+                Text("Sleep at \(sleepStartTime.formatDate(format: "h:mm a")) for the best sleep!")
             }
             
             if let data = predictedSleepData {
@@ -65,8 +98,8 @@ struct MLPredictionView: View {
                     .chartYAxis {
                         AxisMarks(preset: .automatic, position: .leading)
                     }
-                    .padding()
-                    .aspectRatio(8/7, contentMode: .fit)
+//                    .padding()
+//                    .aspectRatio(8/7, contentMode: .fit)
                     
                     Button(action: {
                         health.sleepDataDays.insert(data, at: 0)
@@ -108,7 +141,9 @@ struct MLPredictionView: View {
         }
         .onAppear {
             self.loadModel()
+            self.setAverageSleepTime()
         }
+        .padding()
     }
     
     private func loadModel() {
@@ -128,7 +163,8 @@ struct MLPredictionView: View {
     
     private func calculateSleepDuration() {
         let timeDifference = self.sleepEndTime.timeIntervalSince(Date())
-        let cappedDifference = min(timeDifference, 8.5 * 3600) // in seconds
+        let usualMinutesDesired = self.selectedHours*60 + self.selectedMinutes
+        let cappedDifference:Double = min(timeDifference, TimeInterval(usualMinutesDesired*60)) // in seconds
         
         let mean = cappedDifference * 0.9
         let standardDeviation = cappedDifference * 0.15
@@ -172,7 +208,11 @@ struct MLPredictionView: View {
                 stages.append(prediction.sleep_stage)
             }
             
-            return convertStagesToSleepDataDay(stages: stages)
+//            return convertStagesToSleepDataDay(stages: stages)
+            let sleepDataDay = convertStagesToSleepDataDay(stages: stages)
+            self.predictHeartRate(inputDay: sleepDataDay)
+            return sleepDataDay
+            
             
         } catch {
             print("Error during prediction: \(error.localizedDescription)")
@@ -228,8 +268,56 @@ struct MLPredictionView: View {
             let interval = SleepDataInterval(startDate: startDate, endDate: endDate, stage: stage)
             intervals.append(interval)
         }
+        intervals.sort { $0.startDate > $1.startDate }
         
         return SleepDataDay(startDate: sleepStartTime, endDate: sleepEndTime, intervals: intervals, heartRateIntervals: [HeartRateInterval]())
     }
+    
+    private func setAverageSleepTime(){
+        if health.sleepDataDays.count > 0 {
+            let maxDaysToLoad = min(14, health.sleepDataDays.count) - 1
+            var sleepTime = 0.0
+            for i in 0...maxDaysToLoad {
+                sleepTime += health.sleepDataDays[i].duration / 60
+            }
+            sleepTime /= Double(maxDaysToLoad+1)
+            selectedHours = Int(sleepTime / 60)
+            selectedMinutes = Int(sleepTime) % 60
+        }
+    }
+    
+    func predictHeartRate(inputDay: SleepDataDay) {
+        guard let hrModel = try? LSTMHeartRate(configuration: MLModelConfiguration()) else {
+            print("Error: Failed to load Core ML model.")
+            return
+        }
+        
+        for (i, interval) in inputDay.intervals.enumerated() {
+            do {
+                let sleepInterval = try MLMultiArray(shape: [1, 4, 1], dataType: .float32)
+
+                let inputTemp = LSTMHeartRateInput(lstm_input: sleepInterval)
+
+                inputTemp.lstm_input[[0, 0, 0] as [NSNumber]] = NSNumber(value: interval.startDate.minutesSinceMidnight())
+                inputTemp.lstm_input[[0, 1, 0] as [NSNumber]] = NSNumber(value: interval.endDate.minutesSinceMidnight())
+                inputTemp.lstm_input[[0, 2, 0] as [NSNumber]] = NSNumber(value: i)
+                inputTemp.lstm_input[[0, 3, 0] as [NSNumber]] = NSNumber(value: Stage.index(for: interval.stage))
+
+                let prediction = try hrModel.prediction(input: inputTemp)
+                let bpms = prediction.Identity
+                
+                for i in 0..<Int(interval.duration / 60) {
+                    let p_bpm = bpms[i].intValue
+                    inputDay.heartRateIntervals.append(HeartRateInterval(startDate: interval.startDate.minutesAgo(i), endDate: interval.endDate.minutesAgo(i), bpm: Double(p_bpm)))
+                }
+                
+            } catch {
+                print("Error when predicting heart rate: \(error.localizedDescription)")
+            }
+        }
+    }
+
+
+
 }
 

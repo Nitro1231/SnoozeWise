@@ -9,7 +9,7 @@ import Foundation
 import HealthKit
 import SwiftUI
 
-enum Stage: String, CaseIterable, Codable {
+enum Stage: String, CaseIterable, Codable, Comparable {
     case inBed = "In Bed"
     case awake = "Awake"
     case asleep = "Asleep"
@@ -17,14 +17,24 @@ enum Stage: String, CaseIterable, Codable {
     case coreSleep = "Core Sleep"
     case deepSleep = "Deep Sleep"
     case unknown = "Unknown"
-}
-
-extension Stage: Comparable {
-    static func < (lhs: Stage, rhs: Stage) -> Bool {
+    
+    static func index(for stage: Stage) -> Int {
         let order: [Stage] = [.inBed, .awake, .asleep, .remSleep, .coreSleep, .deepSleep, .unknown]
-        return order.firstIndex(of: lhs)! < order.firstIndex(of: rhs)!
+        return order.firstIndex(of: stage)!
+    }
+    
+    static func < (lhs: Stage, rhs: Stage) -> Bool {
+        return index(for: lhs) < index(for: rhs)
     }
 }
+
+
+//extension Stage: Comparable {
+//    static func < (lhs: Stage, rhs: Stage) -> Bool {
+//        let order: [Stage] = [.inBed, .awake, .asleep, .remSleep, .coreSleep, .deepSleep, .unknown]
+//        return order.firstIndex(of: lhs)! < order.firstIndex(of: rhs)!
+//    }
+//}
 
 struct StageStats{
     var durations: [Stage: TimeInterval]
@@ -225,6 +235,15 @@ extension Date {
             return 0.0
         }
     }
+    
+    func minutesSinceMidnight() -> Int {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: self)
+        guard let hour = components.hour, let minute = components.minute else {
+            return 0
+        }
+        return hour * 60 + minute
+    }
 }
 
 
@@ -253,7 +272,7 @@ class Health: ObservableObject {
     @Published var userName: String = ""
     
     let initialDaysToLoad = 740
-    var newLoadDate: Date // last loaded date
+    var newLoadDate: Date
 
     
     init() {
@@ -278,11 +297,11 @@ class Health: ObservableObject {
         group.enter()
         fetchSleepAnalysis {
             group.leave()
-        }
-        
-        group.enter()
-        fetchHeartRateAnalysis {
-            group.leave()
+            
+            group.enter()
+            self.fetchHeartRateAnalysis {
+                group.leave()
+            }
         }
         
         group.notify(queue: .main) {
@@ -364,7 +383,7 @@ class Health: ObservableObject {
 
     func fetchHeartRateAnalysis(completion: @escaping () -> Void) {
         let end = sleepDataIntervals.count > 0 ? sleepDataIntervals[0].endDate : self.newLoadDate
-        
+        print(end.formatDate())
         let predicate = HKQuery.predicateForSamples(withStart: self.newLoadDate, end: end, options: [])
         let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate)!
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)

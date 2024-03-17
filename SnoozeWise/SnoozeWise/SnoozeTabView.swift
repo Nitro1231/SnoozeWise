@@ -79,6 +79,7 @@ struct SnoozeTabView: View {
                 refreshData()
             }
             .onDisappear{
+//                health.hardReset()
                 saveData()
             }
         }
@@ -124,6 +125,7 @@ struct SnoozeTabView: View {
     
     private func saveData() {
         do {
+            health.fetchAnalysis()
             let sleepData = try JSONEncoder().encode(health.sleepDataIntervals)
             let heartRateData = try JSONEncoder().encode(health.heartRateIntervals)
             UserDefaults.standard.set(sleepData, forKey: "sleepDataIntervals")
