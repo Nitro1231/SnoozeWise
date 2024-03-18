@@ -49,8 +49,8 @@ struct SleepDataDayChartView: View {
             VStack {
                 overviewText
                 sleepStageChart
-                sleepRatioView
                 sleepHeartRateView
+                sleepRatioView
             }
         }
         .toolbar {

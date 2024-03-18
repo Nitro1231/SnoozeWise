@@ -11,26 +11,27 @@ import CoreML
 
 struct MLPredictionView: View {
     @EnvironmentObject var health: Health
-    @State private var model: SleepStageRandomForest?
+    
     @State private var sleepStartTime: Date?
     @State private var sleepEndTime: Date = Date().minutesAgo(-60*10)
     @State private var totalSleepHours: Double = 8
+    
     @State private var predictedSleepData: SleepDataDay? = nil
     @State private var showPredictedChartView = false
     @State private var chartLoadedOnce = false
     @State private var addedToSleepData = false
     @State private var selectedHours = 0
     @State private var selectedMinutes = 0
-    @State private var follow = true
+    @State private var follow = false
     
     var body: some View {
         VStack {
             VStack {
-                Toggle("Follow this?", isOn: $follow)
+                Toggle("Choose your own desired sleep time?", isOn: $follow).minimumScaleFactor(0.5)
                     .font(.callout).frame(height:35)
                 HStack{
                     HStack{
-                        if follow {
+                        if !follow {
                             Text("Your Usual Sleep Duration").font(.callout)
                         } else {
                             Text("Provide a General Desired Amount of Sleep").font(.callout)
@@ -48,7 +49,7 @@ struct MLPredictionView: View {
                         }
                     }
                     .frame(width: 150)
-                    .disabled(follow)
+                    .disabled(!follow)
                 }
             }
             .padding()
@@ -133,18 +134,9 @@ struct MLPredictionView: View {
             }
         }
         .onAppear {
-//            self.loadModel()
             self.setAverageSleepTime()
         }
         .padding()
-    }
-    
-    private func loadModel() {
-        do {
-            self.model = try SleepStageRandomForest(configuration: MLModelConfiguration())
-        } catch {
-            print("Error loading model: \(error.localizedDescription)")
-        }
     }
     
     private func reinitializeViewVariables() {
@@ -166,7 +158,7 @@ struct MLPredictionView: View {
         }
         
         var bestPrediction: SleepDataDay?
-        for _ in 1...1{
+        for _ in 1...5{
             let prediction = runModelIteration(ssModel: ssModel, hrModel: hrModel)
             if let bestScore = bestPrediction?.qualityScore(), bestScore < prediction.qualityScore(){
                 bestPrediction = prediction

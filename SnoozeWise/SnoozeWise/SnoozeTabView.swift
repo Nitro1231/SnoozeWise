@@ -79,7 +79,6 @@ struct SnoozeTabView: View {
                 refreshData()
             }
             .onDisappear{
-//                health.hardReset()
                 saveData()
             }
         }
@@ -101,19 +100,13 @@ struct SnoozeTabView: View {
     }
     
     private func refreshData() {
-//        if health.receivedAuthorization{
-            isRefreshing = true
-            health.fetchAnalysis()
-            isRefreshing = false
-//        }
+        isRefreshing = true
+        health.fetchAnalysis()
+        isRefreshing = false
     }
     
     private func loadData() {
         do {
-//            while(!health.receivedAuthorization){
-//                Thread.sleep(forTimeInterval: 2.0)
-//            }
-//            if health.receivedAuthorization,
             if
                 let loadDate = UserDefaults.standard.object(forKey: "newLoadDate") as? Date,
                 let sleepData = UserDefaults.standard.data(forKey: "sleepDataIntervals"),
@@ -133,7 +126,6 @@ struct SnoozeTabView: View {
     private func saveData() {
         print("Entered save data")
         do {
-//            health.fetchAnalysis()
             let sleepData = try JSONEncoder().encode(health.sleepDataIntervals)
             let heartRateData = try JSONEncoder().encode(health.heartRateIntervals)
             UserDefaults.standard.set(sleepData, forKey: "sleepDataIntervals")
@@ -146,10 +138,3 @@ struct SnoozeTabView: View {
         }
     }
 }
-
-//struct SnoozeTabView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        let h = Health()
-//        SnoozeTabView().environmentObject(h)
-//    }
-//}
