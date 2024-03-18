@@ -10,8 +10,8 @@
 		28A82D6A2B89C94000E1E7CF /* SleepDataDayChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A82D692B89C94000E1E7CF /* SleepDataDayChartView.swift */; };
 		28A82D6C2B89D19900E1E7CF /* SleepDataDayItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A82D6B2B89D19900E1E7CF /* SleepDataDayItemView.swift */; };
 		7E0F17802B8F1DAB00BD405B /* MLPredictionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E0F177F2B8F1DAB00BD405B /* MLPredictionView.swift */; };
-		7E2454132BA0E69100C88AD1 /* SleepStageRandomForest.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 7E2454122BA0E69100C88AD1 /* SleepStageRandomForest.mlmodel */; };
 		7E5A32072BA68F500099746E /* LSTMHeartRate.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A32062BA68F500099746E /* LSTMHeartRate.mlmodel */; };
+		7E5A320B2BA7D5DE0099746E /* LSTMSleepStage.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 7E5A320A2BA7D5DD0099746E /* LSTMSleepStage.mlmodel */; };
 		7E850BC32B88149D00E25E1D /* SnoozeWiseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E850BC22B88149D00E25E1D /* SnoozeWiseApp.swift */; };
 		7E850BC72B8814A000E25E1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E850BC62B8814A000E25E1D /* Assets.xcassets */; };
 		7E850BCA2B8814A000E25E1D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E850BC92B8814A000E25E1D /* Preview Assets.xcassets */; };
@@ -30,9 +30,9 @@
 		28A82D692B89C94000E1E7CF /* SleepDataDayChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataDayChartView.swift; sourceTree = "<group>"; };
 		28A82D6B2B89D19900E1E7CF /* SleepDataDayItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepDataDayItemView.swift; sourceTree = "<group>"; };
 		7E0F177F2B8F1DAB00BD405B /* MLPredictionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLPredictionView.swift; sourceTree = "<group>"; };
-		7E2454122BA0E69100C88AD1 /* SleepStageRandomForest.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = SleepStageRandomForest.mlmodel; path = ../../ML/SleepStageRandomForest.mlmodel; sourceTree = "<group>"; };
 		7E5A32052BA529210099746E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		7E5A32062BA68F500099746E /* LSTMHeartRate.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = LSTMHeartRate.mlmodel; path = ../../ML/LSTMHeartRate.mlmodel; sourceTree = "<group>"; };
+		7E5A320A2BA7D5DD0099746E /* LSTMSleepStage.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = LSTMSleepStage.mlmodel; path = ../../ML/LSTMSleepStage.mlmodel; sourceTree = "<group>"; };
 		7E850BBF2B88149D00E25E1D /* SnoozeWise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnoozeWise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E850BC22B88149D00E25E1D /* SnoozeWiseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeWiseApp.swift; sourceTree = "<group>"; };
 		7E850BC62B8814A000E25E1D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -87,8 +87,8 @@
 				7E850BDA2B88159700E25E1D /* SleepGraphView.swift */,
 				7E850BD22B88151300E25E1D /* HomePageView.swift */,
 				7E0F177F2B8F1DAB00BD405B /* MLPredictionView.swift */,
-				7E2454122BA0E69100C88AD1 /* SleepStageRandomForest.mlmodel */,
 				7E5A32062BA68F500099746E /* LSTMHeartRate.mlmodel */,
+				7E5A320A2BA7D5DD0099746E /* LSTMSleepStage.mlmodel */,
 				7E850BD82B88157400E25E1D /* SleepDataIntervalView.swift */,
 				7E850BD62B88155D00E25E1D /* SleepDataIntervalCardView.swift */,
 				7E850BD42B88154100E25E1D /* SleepDataIntervalCardEditView.swift */,
@@ -192,10 +192,10 @@
 				28A82D6C2B89D19900E1E7CF /* SleepDataDayItemView.swift in Sources */,
 				7E850BD52B88154100E25E1D /* SleepDataIntervalCardEditView.swift in Sources */,
 				7E5A32072BA68F500099746E /* LSTMHeartRate.mlmodel in Sources */,
-				7E2454132BA0E69100C88AD1 /* SleepStageRandomForest.mlmodel in Sources */,
 				7E850BD32B88151300E25E1D /* HomePageView.swift in Sources */,
 				7E850BDB2B88159700E25E1D /* SleepGraphView.swift in Sources */,
 				7E0F17802B8F1DAB00BD405B /* MLPredictionView.swift in Sources */,
+				7E5A320B2BA7D5DE0099746E /* LSTMSleepStage.mlmodel in Sources */,
 				7EC571972B89FA4E00F72D57 /* SleepDataDaysView.swift in Sources */,
 				7E850BC32B88149D00E25E1D /* SnoozeWiseApp.swift in Sources */,
 				7E850BDD2B8815BB00E25E1D /* SnoozeTabView.swift in Sources */,
@@ -334,7 +334,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SnoozeWise/Preview Content\"";
-				DEVELOPMENT_TEAM = 8NVWF4DRP7;
+				DEVELOPMENT_TEAM = DCXKK746R9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SnoozeWise/Info.plist;
@@ -350,7 +350,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = edu.uci;
+				PRODUCT_BUNDLE_IDENTIFIER = com.guptarohan2003;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -367,7 +367,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SnoozeWise/Preview Content\"";
-				DEVELOPMENT_TEAM = 8NVWF4DRP7;
+				DEVELOPMENT_TEAM = DCXKK746R9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SnoozeWise/Info.plist;
@@ -383,7 +383,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = edu.uci;
+				PRODUCT_BUNDLE_IDENTIFIER = com.guptarohan2003;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;

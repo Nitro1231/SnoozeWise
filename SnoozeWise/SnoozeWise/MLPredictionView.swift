@@ -9,13 +9,6 @@ import SwiftUI
 import Charts
 import CoreML
 
-
-//struct SleepStagePrediction {
-//    var stage: String
-//    var startTime: Date
-//    var endTime: Date
-//}
-
 struct MLPredictionView: View {
     @EnvironmentObject var health: Health
     @State private var model: SleepStageRandomForest?
@@ -69,7 +62,7 @@ struct MLPredictionView: View {
             Button("Predict an IDEAL bed time for you") {
                 health.fetchAnalysis()
                 reinitializeViewVariables()
-                predictSleepStages()
+                predictBestSleep()
             }.padding()
             
             if let sleepStartTime = self.sleepStartTime {
@@ -140,7 +133,7 @@ struct MLPredictionView: View {
             }
         }
         .onAppear {
-            self.loadModel()
+//            self.loadModel()
             self.setAverageSleepTime()
         }
         .padding()
@@ -161,137 +154,127 @@ struct MLPredictionView: View {
         self.predictedSleepData = nil
     }
     
-    private func calculateSleepDuration() {
-        let timeDifference = self.sleepEndTime.timeIntervalSince(Date())
-        let usualMinutesDesired = self.selectedHours*60 + self.selectedMinutes
-        let cappedDifference:Double = min(timeDifference, TimeInterval(usualMinutesDesired*60)) // in seconds
-        
-        let mean = cappedDifference * 0.9
-        let standardDeviation = cappedDifference * 0.15
-        
-        let randomNumber = Double.random(in: -1...1)
-        let gaussianNumber = mean + randomNumber * standardDeviation
-        
-//        print("timeDifference: \(cappedDifference / 3600), estimated sleep hours: \(gaussianNumber / 3600)")
-        self.totalSleepHours = gaussianNumber / 3600
-    }
 
-    private func predictSleepStages() {
-        guard let model = model else {
-            print("ML model is not loaded.")
+    private func predictBestSleep() {
+        guard let ssModel = try? LSTMSleepStage(configuration: MLModelConfiguration()) else {
+            print("Error: Failed to load Sleep Stage model.")
             return
         }
-              
-        var bestPrediction: SleepDataDay = runModelIteration(model)
-        for _ in 1...5{
-            // get a gaussian prediction for totalSleepHours
-            calculateSleepDuration()
-              
-            let prediction = runModelIteration(model)
-            if(prediction.qualityScore() > bestPrediction.qualityScore()){
+        guard let hrModel = try? LSTMHeartRate(configuration: MLModelConfiguration()) else {
+            print("Error: Failed to load Heart Rate model.")
+            return
+        }
+        
+        var bestPrediction: SleepDataDay?
+        for _ in 1...1{
+            let prediction = runModelIteration(ssModel: ssModel, hrModel: hrModel)
+            if let bestScore = bestPrediction?.qualityScore(), bestScore < prediction.qualityScore(){
+                bestPrediction = prediction
+            } else {
                 bestPrediction = prediction
             }
         }
 
-        // update chart display
-        self.predictedSleepData = bestPrediction
-        self.sleepStartTime = bestPrediction.startDate
+        self.predictedSleepData = bestPrediction!  // update chart display
+        self.sleepStartTime = bestPrediction!.startDate
     }
     
-    private func runModelIteration(_ model: SleepStageRandomForest) -> SleepDataDay {
+    
+    private func runModelIteration(ssModel: LSTMSleepStage, hrModel: LSTMHeartRate) -> SleepDataDay {
+        
+        calculateSleepDuration() // get a gaussian prediction for totalSleepHours
+        let sleepDataDay = predictSleepStages(ssModel: ssModel)
+        predictHeartRate(hrModel: hrModel, inputDay: sleepDataDay)
+        
+        return sleepDataDay
+    }
+    
+    private func predictSleepStages(ssModel: LSTMSleepStage) -> SleepDataDay {
         do {
-            let inputFeatures: [SleepStageRandomForestInput] = prepareInputFeatures()
-            
-            var stages: [Int64] = []
-            for inputFeature:SleepStageRandomForestInput in inputFeatures {
-                let prediction: SleepStageRandomForestOutput = try model.prediction(input: inputFeature)
-                stages.append(prediction.sleep_stage)
+            let sleepInterval = try MLMultiArray(shape: [1, 3, 1], dataType: .float32)
+            let sleepStartTime: Date = sleepEndTime.minutesAgo(Int(60*self.totalSleepHours))
+            let inputTemp = LSTMSleepStageInput(lstm_10_input: sleepInterval)
+            inputTemp.lstm_10_input[[0, 0, 0] as [NSNumber]] = NSNumber(value: sleepStartTime.minutesSinceMidnight())
+            inputTemp.lstm_10_input[[0, 1, 0] as [NSNumber]] = NSNumber(value: sleepEndTime.minutesSinceMidnight())
+            inputTemp.lstm_10_input[[0, 2, 0] as [NSNumber]] = NSNumber(value: sleepEndTime.getDayOfWeek())
+
+            let prediction = try ssModel.prediction(input: inputTemp)
+            let stages = prediction.Identity
+
+            var final_stages: [Int] = []
+            let sleepDurationMinutes = Int(sleepEndTime.timeIntervalSince(sleepStartTime) / 60)
+
+            for i in 0..<sleepDurationMinutes {
+                if i >= stages.count {
+                    final_stages.append(final_stages[final_stages.count - 1])
+                } else {
+                    var maxIndex = 0
+                    var maxProb: Float = 0
+                    
+                    for j in 0...3{
+                        let prob = Float(truncating: stages[4*i+j])
+                        if prob > maxProb{
+                            maxProb = prob
+                            maxIndex = j
+                        }
+                    }
+                    
+                    switch maxIndex {
+                    case 0:
+                        final_stages.append(4)
+                    case 1:
+                        final_stages.append(3)
+                    case 2:
+                        final_stages.append(1)
+                    default:
+                        final_stages.append(5)
+                    }
+                }
             }
             
-//            return convertStagesToSleepDataDay(stages: stages)
-            let sleepDataDay = convertStagesToSleepDataDay(stages: stages)
-            self.predictHeartRate(inputDay: sleepDataDay)
-            return sleepDataDay
+            // grouping intervals
+            var intervals = [SleepDataInterval]()
+            var previousStage: Int?
+            var startIndex = 0
+            for i in 0..<final_stages.count {
+                let currentStage = final_stages[i]
+
+                if let prevStage = previousStage, currentStage != prevStage {
+                    intervals.append(
+                        SleepDataInterval(
+                            startDate: sleepStartTime.minutesAgo(-startIndex),
+                            endDate: sleepStartTime.minutesAgo(-i),
+                            stage: Stage.stage(for: prevStage)!
+                        )
+                    )
+
+                    startIndex = i
+                }
+
+                previousStage = currentStage
+            }
+            if let prevStage = previousStage {
+                intervals.append(
+                    SleepDataInterval(
+                        startDate: sleepStartTime.minutesAgo(-startIndex),
+                        endDate: sleepStartTime.minutesAgo(-final_stages.count),
+                        stage: Stage.stage(for: prevStage)!
+                    )
+                )
+            }
+            intervals.sort { $0.startDate > $1.startDate }
             
+            
+            return SleepDataDay(startDate: sleepStartTime, endDate: sleepEndTime, intervals: intervals, heartRateIntervals: [HeartRateInterval]())
             
         } catch {
-            print("Error during prediction: \(error.localizedDescription)")
-            
+            print("Error predicting sleep stages: \(error.localizedDescription)")
             let dummyDate = Date()
-            return SleepDataDay(startDate: dummyDate, endDate: dummyDate, intervals: [], heartRateIntervals: [HeartRateInterval]())
+            return SleepDataDay(startDate: dummyDate, endDate: dummyDate, intervals: [SleepDataInterval](), heartRateIntervals: [HeartRateInterval]())
         }
     }
     
-    private func prepareInputFeatures() -> [SleepStageRandomForestInput] {
-        var list: [SleepStageRandomForestInput] = []
-        
-        let day_of_week = self.sleepEndTime.getDayOfWeek()
-        let numMinutes = Int(60*self.totalSleepHours)
-        let currentDate = self.sleepEndTime.minutesAgo(numMinutes)
-        var start_time_counter = Double(NSCalendar(calendarIdentifier: .gregorian)!.component(.hour, from: currentDate)*60 + Calendar.current.component(.minute, from: currentDate))
-
-        for i in 0...numMinutes {
-            list.append(SleepStageRandomForestInput(start_time: start_time_counter, interval:Double(i), day_of_week: day_of_week))
-            start_time_counter += 1
-        }
-        
-        return list
-    }
-
-    func convertStagesToSleepDataDay(stages: [Int64], totalSleepHours: Double = 8) -> SleepDataDay {
-        var intervals = [SleepDataInterval]()
-        var currentStageIndex = stages.first ?? 0
-        var intervalStartIndex = 0
-        
-        let sleepStartTime = self.sleepEndTime.minutesAgo(Int(60*self.totalSleepHours))
-        let stageValues: [Stage] = [.inBed, .awake, .asleep, .remSleep, .coreSleep, .deepSleep, .unknown]
-
-        // group contiguous minutes with the same stage
-        for (index, stageIndex) in stages.enumerated() {
-            if stageIndex != currentStageIndex {
-                if let stage = stageValues.enumerated().first(where: { $0.offset == currentStageIndex })?.element {
-                    let startDate = sleepStartTime.minutesAgo(-intervalStartIndex)
-                    let endDate = sleepStartTime.minutesAgo(-index)
-                    let interval = SleepDataInterval(startDate: startDate, endDate: endDate, stage: stage)
-                    intervals.append(interval)
-                }
-                
-                currentStageIndex = stageIndex
-                intervalStartIndex = index
-            }
-        }
-        
-        // close the last interval
-        if let stage = stageValues.enumerated().first(where: { $0.offset == currentStageIndex })?.element {
-            let startDate = sleepStartTime.minutesAgo(-intervalStartIndex)
-            let endDate = sleepStartTime.minutesAgo(-stages.count)
-            let interval = SleepDataInterval(startDate: startDate, endDate: endDate, stage: stage)
-            intervals.append(interval)
-        }
-        intervals.sort { $0.startDate > $1.startDate }
-        
-        return SleepDataDay(startDate: sleepStartTime, endDate: sleepEndTime, intervals: intervals, heartRateIntervals: [HeartRateInterval]())
-    }
-    
-    private func setAverageSleepTime(){
-        if health.sleepDataDays.count > 0 {
-            let maxDaysToLoad = min(14, health.sleepDataDays.count) - 1
-            var sleepTime = 0.0
-            for i in 0...maxDaysToLoad {
-                sleepTime += health.sleepDataDays[i].duration / 60
-            }
-            sleepTime /= Double(maxDaysToLoad+1)
-            selectedHours = Int(sleepTime / 60)
-            selectedMinutes = Int(sleepTime) % 60
-        }
-    }
-    
-    func predictHeartRate(inputDay: SleepDataDay) {
-        guard let hrModel = try? LSTMHeartRate(configuration: MLModelConfiguration()) else {
-            print("Error: Failed to load Core ML model.")
-            return
-        }
-        
+    func predictHeartRate(hrModel: LSTMHeartRate, inputDay: SleepDataDay) {
         for (i, interval) in inputDay.intervals.enumerated() {
             do {
                 let sleepInterval = try MLMultiArray(shape: [1, 4, 1], dataType: .float32)
@@ -306,18 +289,65 @@ struct MLPredictionView: View {
                 let prediction = try hrModel.prediction(input: inputTemp)
                 let bpms = prediction.Identity
                 
-                for i in 0..<Int(interval.duration / 60) {
-                    let p_bpm = bpms[i].intValue
-                    inputDay.heartRateIntervals.append(HeartRateInterval(startDate: interval.startDate.minutesAgo(i), endDate: interval.endDate.minutesAgo(i), bpm: Double(p_bpm)))
+                let intervalDurationMinutes = Int(interval.duration / 60)
+                var previousBPM: Int?
+                var startIndex = 0
+
+                for i in 0..<intervalDurationMinutes {
+                    let currentBPM: Int
+                    if i >= bpms.count {
+                        currentBPM = bpms[bpms.count-1].intValue
+                    } else {
+                        currentBPM = max(35,bpms[i].intValue)
+                    }
+                    
+                    if let prevBPM = previousBPM, currentBPM != prevBPM {
+                        inputDay.heartRateIntervals.append(HeartRateInterval(startDate: interval.startDate.minutesAgo(-startIndex), endDate: interval.startDate.minutesAgo(-i), bpm: Double(prevBPM)))
+                        
+                        startIndex = i
+                    }
+                    
+                    previousBPM = currentBPM
+                }
+                if let prevBPM = previousBPM {
+                    inputDay.heartRateIntervals.append(HeartRateInterval(startDate: interval.startDate.minutesAgo(-startIndex), endDate: interval.startDate.minutesAgo(-intervalDurationMinutes), bpm: Double(prevBPM)))
                 }
                 
+                inputDay.heartRateIntervals.sort { $0.startDate > $1.startDate }
+                
             } catch {
-                print("Error when predicting heart rate: \(error.localizedDescription)")
+                print("Error predicting heart rate: \(error.localizedDescription)")
             }
         }
     }
-
-
-
+    
+    private func calculateSleepDuration() {
+        let timeDifference = self.sleepEndTime.timeIntervalSince(Date())
+        let usualMinutesDesired = self.selectedHours*60 + self.selectedMinutes
+        let cappedDifference:Double = min(timeDifference, TimeInterval(usualMinutesDesired*60)) // in seconds
+        
+        let mean = cappedDifference * 0.9
+        let standardDeviation = cappedDifference * 0.15
+        
+        let randomNumber = Double.random(in: -1...1)
+        let gaussianNumber = mean + randomNumber * standardDeviation
+        
+        print("timeDifference: \(cappedDifference / 3600), estimated sleep hours: \(gaussianNumber / 3600)")
+        self.totalSleepHours = gaussianNumber / 3600
+    }
+    
+    private func setAverageSleepTime(){
+        if health.sleepDataDays.count > 0 {
+            let maxDaysToLoad = min(14, health.sleepDataDays.count) - 1
+            var sleepTime = 0.0
+            for i in 0...maxDaysToLoad {
+                sleepTime += health.sleepDataDays[i].duration / 60
+            }
+            sleepTime /= Double(maxDaysToLoad+1)
+            selectedHours = Int(sleepTime / 60)
+            selectedMinutes = Int(sleepTime) % 60
+            
+        }
+    }
 }
 

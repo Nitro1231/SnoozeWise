@@ -29,12 +29,6 @@ struct SleepDataDayChartView: View {
         let duration: TimeInterval
     }
     
-    //    struct HeartRateData: Identifiable {
-    //        let id = UUID()
-    //        let time: Date
-    //        let bpm: Double
-    //    }
-    
     var sleepStageChartData: [StageData] {
         let statistics = data.getStageStatistics()
         return statistics.durations.map { stage, duration in
@@ -180,7 +174,7 @@ struct SleepDataDayChartView: View {
                         .font(.system(size: 18))
                         .foregroundColor(health.getColorForStage(.coreSleep))
                         .bold()
-                    Text(data.formattedTotalSleepDuration)
+                    Text(data.formattedDuration)
                         .font(.system(size: 26))
                 }
                 .padding()

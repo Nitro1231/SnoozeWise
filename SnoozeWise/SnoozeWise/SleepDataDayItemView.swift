@@ -28,7 +28,7 @@ struct SleepDataDayItemView: View {
                         Text("Time Asleep")
                             .font(.subheadline)
                             .bold()
-                        Text(data.formattedTotalSleepDuration)
+                        Text(data.formattedDuration)
                             .font(.system(size: 20))
                     }
                     .padding()
